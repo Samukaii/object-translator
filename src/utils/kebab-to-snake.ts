@@ -1,0 +1,1 @@
+export const kebabToSnake = (kebabCaseString: string): string => kebabCaseString.replace(/-/g, '_');

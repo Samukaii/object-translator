@@ -1,0 +1,37 @@
+{
+  "folderName": "translations",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ts-node src/index.ts",
+    "dev": "nodemon --watch 'src/' --exec 'ts-node src/index.ts' -e ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "@types/stringify-object": "^4.0.5",
+    "esbuild": "^0.20.2",
+    "nodemon": "^3.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@parvineyvazov/json-translator": "^1.7.0",
+    "@types/cli-progress": "^3.11.5",
+    "@types/is-obj": "^2.0.1",
+    "@types/is-regexp": "^2.1.2",
+    "@types/minimist": "^1.2.5",
+    "bing-translate-api": "^4.0.1",
+    "cli-progress": "^3.12.0",
+    "colors": "^1.4.0",
+    "get-own-enumerable-keys": "^1.0.0",
+    "is-obj": "^3.0.0",
+    "is-regexp": "^3.1.0",
+    "loading-cli": "^1.1.2",
+    "minimist": "^1.2.8"
+  }
+}
