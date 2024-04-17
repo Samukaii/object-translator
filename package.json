@@ -1,36 +1,39 @@
 {
   "folderName": "translations",
   "version": "1.0.0",
-  "name": "translator",
+  "name": "@samukaii/translator",
   "description": "",
   "main": "dist/index.js",
   "bin": {
     "translator": "./dist/index.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "ts-node src/index.ts",
-    "build": "npx tsc",
-    "dev": "nodemon --watch 'src/' --exec 'ts-node src/index.ts' -e ts"
+    "build": "npx tsc"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "cli",
+    "translation",
+    "localize",
+    "internationalization",
+    "npmtool"
+  ],
+  "author": "Samuel Alejandro dos Santos Veras",
   "license": "ISC",
+  "repository": "https://github.com/Samukaii/object-translator",
+  "homepage": "https://github.com/Samukaii/object-translator#readme",
   "devDependencies": {
     "@types/node": "^20.12.7",
     "nodemon": "^3.1.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.5"
-  },
-  "dependencies": {
+    "typescript": "^5.4.5",
     "@types/cli-progress": "^3.11.5",
     "@types/commander": "^2.12.2",
     "@types/figlet": "^1.5.8",
-    "@types/is-obj": "^2.0.1",
-    "@types/is-regexp": "^2.1.2",
-    "@types/minimist": "^1.2.5",
+    "@types/minimist": "^1.2.5"
+  },
+  "dependencies": {
     "bing-translate-api": "^4.0.1",
-    "cli-progress": "^3.12.0",
     "colors": "^1.4.0",
     "commander": "^12.0.0",
     "figlet": "^1.7.0",

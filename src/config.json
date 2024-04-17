@@ -1,5 +1,5 @@
 {
-  "basePath": "/home/samuel/programming/joinin/web/src/app/languages",
+  "basePath": "/base/path/to/your/translations",
   "translationSuffix": "translate",
   "sourceLanguage": {
     "folderName": "pt-BR",
