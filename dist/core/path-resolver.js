@@ -1,27 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -40,7 +17,17 @@ const config_json_1 = __importDefault(require("../config.json"));
 const kebab_to_snake_1 = require("../utils/kebab-to-snake");
 const file_not_found_error_1 = require("../exceptions/file-not-found-error");
 const could_not_found_variable_1 = require("../exceptions/could-not-found-variable");
+const fs_1 = __importDefault(require("fs"));
 const { sourceLanguage, basePath, translationSuffix } = config_json_1.default;
+const importVariable = (varName, path) => {
+    const content = fs_1.default.readFileSync(path, 'utf8');
+    const value = content.substring(content.indexOf('{'), content.lastIndexOf('}') + 1);
+    let variable = {};
+    eval(`variable = ${value}`);
+    return {
+        [varName]: variable
+    };
+};
 const createPathResolver = (fileName) => __awaiter(void 0, void 0, void 0, function* () {
     let file = fileName;
     let parentPath = "";
@@ -57,13 +44,13 @@ const createPathResolver = (fileName) => __awaiter(void 0, void 0, void 0, funct
     };
     let result;
     const sourceLanguagePath = getFullPath(sourceLanguage.folderName);
+    const varName = (0, kebab_to_snake_1.kebabToSnake)(`${file}${suffix}`).toUpperCase();
     try {
-        result = yield Promise.resolve(`${sourceLanguagePath}`).then(s => __importStar(require(s)));
+        result = importVariable(varName, sourceLanguagePath);
     }
     catch (e) {
         throw new file_not_found_error_1.FileNotFoundError(sourceLanguagePath);
     }
-    const varName = (0, kebab_to_snake_1.kebabToSnake)(`${file}${suffix}`).toUpperCase();
     if (!result[varName])
         throw new could_not_found_variable_1.CouldNotFoundVariable(varName, sourceLanguagePath);
     return {

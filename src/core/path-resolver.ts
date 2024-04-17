@@ -3,9 +3,23 @@ import {kebabToSnake} from "../utils/kebab-to-snake";
 import {Generic} from "../utils/stringify-object";
 import {FileNotFoundError} from "../exceptions/file-not-found-error";
 import {CouldNotFoundVariable} from "../exceptions/could-not-found-variable";
+import fs from "fs";
 
 const {sourceLanguage, basePath, translationSuffix} = config;
 
+
+const importVariable = (varName: string, path: string) => {
+    const content = fs.readFileSync(path, 'utf8');
+
+    const value = content.substring(content.indexOf('{'), content.lastIndexOf('}') + 1);
+
+    let variable: Generic = {};
+    eval(`variable = ${value}`);
+
+    return {
+        [varName]: variable
+    };
+}
 
 export const createPathResolver = async (fileName: string) => {
     let file = fileName;
@@ -28,15 +42,15 @@ export const createPathResolver = async (fileName: string) => {
 
     let result: Generic;
     const sourceLanguagePath = getFullPath(sourceLanguage.folderName);
+    const varName = kebabToSnake(`${file}${suffix}`).toUpperCase();
 
     try {
-        result = await import(sourceLanguagePath);
+        result = importVariable(varName, sourceLanguagePath);
     }
     catch (e) {
         throw new FileNotFoundError(sourceLanguagePath);
     }
 
-    const varName = kebabToSnake(`${file}${suffix}`).toUpperCase();
 
     if(!result[varName])
         throw new CouldNotFoundVariable(varName, sourceLanguagePath);
