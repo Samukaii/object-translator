@@ -1,3 +1,4 @@
+#! /usr/bin/env node
 import {translateObject} from "./utils/translate-object";
 import config from "./config.json";
 import {ApplicationConfig} from "./models/application-config";
