@@ -1,5 +1,5 @@
 # Translator
-![image](https://github.com/Samukaii/object-translator/assets/54710691/9142d73a-e304-493c-b76e-5b4a2ff1c892)
+![image](https://github.com/Samukaii/object-translator/assets/54710691/ba09d6f7-bf30-4830-b424-e77226c1980a)
 
 Translator é uma cli para a geração automática de traduções usando o Bing Translate
 
