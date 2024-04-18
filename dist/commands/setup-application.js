@@ -59,6 +59,9 @@ import { allLanguages } from "../static/all-languages.js";
 import fs from "node:fs";
 import path from "node:path";
 import { loadingBar } from "../core/loading-bar.js";
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+var __dirname = dirname(fileURLToPath(import.meta.url));
 var getLanguageInfo = function (language) {
     var _a = language.split('-'), label = _a[0], value = _a[1];
     var withoutParentesis = value
@@ -124,7 +127,7 @@ var askFolderNames = function (languages) { return __awaiter(void 0, void 0, voi
 }); };
 var saveConfig = function (config) {
     loadingBar().start();
-    var fullPath = path.dirname(__filename);
+    var fullPath = path.resolve(__dirname, 'settings.json');
     console.log(fullPath);
     var content = JSON.stringify(config, null, 2);
     fs.writeFileSync(fullPath, content);

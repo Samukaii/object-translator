@@ -4,7 +4,10 @@ import fs from "node:fs";
 import {Generic} from "../utils/stringify-object.js";
 import path from "node:path";
 import {loadingBar} from "../core/loading-bar.js";
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const getLanguageInfo = (language: string) => {
     const [label, value] = language.split('-');
@@ -72,8 +75,9 @@ const askFolderNames = async (languages: {label: string; value: string}[]) => {
 
 const saveConfig = (config: Generic) => {
     loadingBar().start();
-    const fullPath = path.dirname(__filename);
+    const fullPath = path.resolve(__dirname, 'settings.json');
     console.log(fullPath);
+
 
     const content = JSON.stringify(config, null, 2);
 
