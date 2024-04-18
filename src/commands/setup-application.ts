@@ -74,7 +74,7 @@ const askFolderNames = async (languages: {label: string; value: string}[]) => {
 
 const saveConfig = (config: Generic) => {
     loadingBar().start();
-    const fullPath = path.resolve(__dirname, 'config.json');
+    const fullPath = path.resolve(__dirname, '../config.json');
 
     const content = JSON.stringify(config, null, 2);
 

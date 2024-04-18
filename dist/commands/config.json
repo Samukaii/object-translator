@@ -1,0 +1,16 @@
+{
+  "basePath": "/home/samuel/programming/joinin/web/src/app/languages",
+  "translationSuffix": "translate",
+  "sourceLanguage": {
+    "label": "Afrikaans",
+    "value": "af",
+    "folderName": "af"
+  },
+  "languages": [
+    {
+      "label": "Albanian",
+      "value": "sq",
+      "folderName": "sq"
+    }
+  ]
+}
