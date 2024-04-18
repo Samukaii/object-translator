@@ -81,6 +81,7 @@ export var createTranslations = function (args) { return __awaiter(void 0, void 
                     var path = resolver.getFullPath(language.folderName);
                     console.log("".concat(languageLabel.blue, " => ").concat(path.yellow));
                 });
+                loading.stop();
                 return [2 /*return*/];
         }
     });

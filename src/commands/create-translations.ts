@@ -55,4 +55,6 @@ export const createTranslations = async (args: CreateTranslationArgs) => {
 
         console.log(`${languageLabel.blue} => ${path.yellow}`);
     });
+
+    loading.stop();
 };
