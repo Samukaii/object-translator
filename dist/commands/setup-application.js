@@ -57,6 +57,8 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 import inquirer from 'inquirer';
 import { allLanguages } from "../static/all-languages.js";
 import fs from "node:fs";
+import path from "node:path";
+import { loadingBar } from "../core/loading-bar.js";
 var getLanguageInfo = function (language) {
     var _a = language.split('-'), label = _a[0], value = _a[1];
     var withoutParentesis = value
@@ -97,7 +99,8 @@ var askDefaultConfig = function () {
             filter: function (input) { return input.map(getLanguageInfo); },
             choices: function (answers) { return allLanguages
                 .filter(function (language) { return language.value !== answers.sourceLanguage.value; })
-                .map(function (input) { return "".concat(input.label, " - (").concat(input.value, ")"); }); }
+                .map(function (input) { return "".concat(input.label, " - (").concat(input.value, ")"); }); },
+            validate: function (input) { return !input.length ? "You must select at least one language" : true; }
         },
     ]);
 };
@@ -120,7 +123,15 @@ var askFolderNames = function (languages) { return __awaiter(void 0, void 0, voi
     });
 }); };
 var saveConfig = function (config) {
-    fs.writeFileSync('src/config.json', JSON.stringify(config));
+    loadingBar().start();
+    var file = 'src/config.json';
+    var content = JSON.stringify(config, null, 2);
+    fs.writeFileSync(file, content);
+    var fullPath = path.resolve(file);
+    console.log('');
+    loadingBar().succeed(' Configurations updated succesfully!'.green);
+    console.log("File: ".concat(fullPath).yellow);
+    console.log('');
 };
 export var setupApplication = function () { return __awaiter(void 0, void 0, void 0, function () {
     var basicConfig, languages, fullConfig;

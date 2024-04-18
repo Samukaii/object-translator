@@ -2,6 +2,8 @@ import inquirer, {Question} from 'inquirer';
 import {allLanguages} from "../static/all-languages.js";
 import fs from "node:fs";
 import {Generic} from "../utils/stringify-object.js";
+import path from "node:path";
+import {loadingBar} from "../core/loading-bar.js";
 
 
 const getLanguageInfo = (language: string) => {
@@ -46,7 +48,8 @@ const askDefaultConfig = () => {
             filter: (input: string[]) => input.map(getLanguageInfo),
             choices: (answers) => allLanguages
                 .filter(language => language.value !== answers.sourceLanguage.value)
-                .map(input => `${input.label} - (${input.value})`)
+                .map(input => `${input.label} - (${input.value})`),
+            validate: (input: Generic[]) => !input.length ? "You must select at least one language" : true
         },
     ]);
 }
@@ -68,7 +71,18 @@ const askFolderNames = async (languages: {label: string; value: string}[]) => {
 }
 
 const saveConfig = (config: Generic) => {
-    fs.writeFileSync('src/config.json', JSON.stringify(config));
+    loadingBar().start();
+    const file = 'src/config.json';
+    const content = JSON.stringify(config, null, 2);
+
+    fs.writeFileSync(file, content);
+
+    const fullPath = path.resolve(file);
+
+    console.log('');
+    loadingBar().succeed(' Configurations updated succesfully!'.green);
+    console.log(`File: ${fullPath}`.yellow);
+    console.log('');
 }
 
 export const setupApplication = async () => {

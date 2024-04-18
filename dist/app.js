@@ -1,4 +1,4 @@
-#! /usr/bin/env node
+#! /usr/bin/env node --no-warnings=ExperimentalWarning
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -43,7 +43,7 @@ import { Command } from "commander";
 import { createTranslations } from "./commands/create-translations.js";
 import { setupApplication } from "./commands/setup-application.js";
 var program = new Command();
-console.log(figlet.textSync("Translator").cyan);
+console.log(figlet.textSync("Translator").random);
 var bootstrap = function () { return __awaiter(void 0, void 0, void 0, function () {
     var args;
     return __generator(this, function (_a) {
@@ -70,7 +70,7 @@ program
     .catch(function (error) { return exceptionHandler(error); })
     .finally(function () { return loadingBar().stop(); }); });
 program.command('config')
-    .description('Config the cli')
+    .description('Setup the aplication')
     .action(function () { return setupApplication(); });
 program.parse(process.argv);
 //# sourceMappingURL=app.js.map

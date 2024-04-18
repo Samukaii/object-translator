@@ -1,21 +1,16 @@
 {
-  "basePath": "/base/path/to/your/translations",
+  "basePath": "/home/samuel/programming/object-translator",
   "translationSuffix": "translate",
   "sourceLanguage": {
-    "folderName": "pt-BR",
-    "label": "Portuguese",
-    "value": "pt"
+    "label": "Afrikaans",
+    "value": "af",
+    "folderName": "af"
   },
   "languages": [
     {
-      "folderName": "en-US",
-      "label": "English",
-      "value": "en"
-    },
-    {
-      "folderName": "es-ES",
-      "label": "Spanish",
-      "value": "es"
+      "label": "Albanian",
+      "value": "sq",
+      "folderName": "sq"
     }
   ]
 }

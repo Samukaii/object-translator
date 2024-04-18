@@ -1,4 +1,5 @@
-#! /usr/bin/env node
+#! /usr/bin/env node --no-warnings=ExperimentalWarning
+
 import {CreateTranslationArgs} from "./models/create-translation-args.js";
 import 'colors';
 import {exceptionHandler} from "./exceptions/exception-handler.js";
@@ -10,7 +11,7 @@ import {setupApplication} from "./commands/setup-application.js";
 
 const program = new Command();
 
-console.log(figlet.textSync("Translator").cyan);
+console.log(figlet.textSync("Translator").blue);
 
 const bootstrap = async () => {
     const args: CreateTranslationArgs = {
@@ -30,7 +31,7 @@ program
     )
 
 program.command('config')
-    .description('Config the cli')
+    .description('Setup the aplication')
     .action(() => setupApplication());
 
 program.parse(process.argv);
