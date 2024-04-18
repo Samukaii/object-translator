@@ -1,4 +1,4 @@
-#! /usr/bin/env node --no-warnings=ExperimentalWarning
+#! /usr/bin/env node
 
 import {CreateTranslationArgs} from "./models/create-translation-args.js";
 import 'colors';
