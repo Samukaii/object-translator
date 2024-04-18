@@ -1,4 +1,4 @@
-import {Generic, stringifyObject} from "../utils/stringify-object";
+import {Generic, stringifyObject} from "../utils/stringify-object.js";
 import path from "node:path";
 import fs from "node:fs";
 

@@ -1,20 +1,17 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.convertObjectToTranslations = void 0;
-const convertObjectToTranslations = (object) => {
-    const result = [];
-    function traverse(obj, path = "") {
-        for (const key in obj) {
+export var convertObjectToTranslations = function (object) {
+    var result = [];
+    function traverse(obj, path) {
+        if (path === void 0) { path = ""; }
+        for (var key in obj) {
             if (typeof obj[key] === 'object') {
-                traverse(obj[key], path ? `${path}.${key}` : key);
+                traverse(obj[key], path ? "".concat(path, ".").concat(key) : key);
             }
             else {
-                result.push({ path: path ? `${path}.${key}` : key, value: obj[key] });
+                result.push({ path: path ? "".concat(path, ".").concat(key) : key, value: obj[key] });
             }
         }
     }
     traverse(object);
     return result;
 };
-exports.convertObjectToTranslations = convertObjectToTranslations;
 //# sourceMappingURL=convert-object-to-translations.js.map

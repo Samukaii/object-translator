@@ -1,9 +1,9 @@
-import {CreateTranslationArgs} from "../models/create-translation-args";
-import {loadingBar} from "../core/loading-bar";
-import {createPathResolver} from "../core/path-resolver";
-import config from "../config.json";
-import {translateObject} from "../utils/translate-object";
-import {fileCreator} from "../core/file-creator";
+import {CreateTranslationArgs} from "../models/create-translation-args.js";
+import {loadingBar} from "../core/loading-bar.js";
+import {createPathResolver} from "../core/path-resolver.js";
+import config from "../config.json" assert {type: "json"};
+import {translateObject} from "../utils/translate-object.js";
+import {fileCreator} from "../core/file-creator.js";
 
 const joinItems = (items: string[]) => {
     const last = items.pop();

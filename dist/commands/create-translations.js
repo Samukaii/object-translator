@@ -1,4 +1,3 @@
-#! /usr/bin/env node
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -35,42 +34,55 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-import 'colors';
-import { exceptionHandler } from "./exceptions/exception-handler.js";
-import { loadingBar } from "./core/loading-bar.js";
-import figlet from 'figlet';
-import { Command } from "commander";
-import { createTranslations } from "./commands/create-translations.js";
-import { setupApplication } from "./commands/setup-application.js";
-var program = new Command();
-console.log(figlet.textSync("Translator").cyan);
-var bootstrap = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var args;
+import { loadingBar } from "../core/loading-bar.js";
+import { createPathResolver } from "../core/path-resolver.js";
+import config from "../config.json" assert { type: "json" };
+import { translateObject } from "../utils/translate-object.js";
+import { fileCreator } from "../core/file-creator.js";
+var joinItems = function (items) {
+    var last = items.pop();
+    return "".concat(items.join(", ")).concat(last ? ' and ' + last : '');
+};
+var sourceLanguage = config.sourceLanguage.label;
+var languages = joinItems(config.languages.map(function (language) { return language.label; }));
+var message = "Translating ".concat(sourceLanguage, " to ").concat(languages).blue;
+export var createTranslations = function (args) { return __awaiter(void 0, void 0, void 0, function () {
+    var file, loading, resolver, sourceLanguage, index, language, translated;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                args = {
-                    file: process.argv[2],
-                };
-                if (!!args.file) return [3 /*break*/, 1];
-                program.outputHelp();
-                return [3 /*break*/, 3];
-            case 1: return [4 /*yield*/, createTranslations(args)];
+                file = args.file;
+                loading = loadingBar();
+                return [4 /*yield*/, createPathResolver(file)];
+            case 1:
+                resolver = _a.sent();
+                sourceLanguage = config.sourceLanguage;
+                loading.start(message);
+                index = 0;
+                _a.label = 2;
             case 2:
-                _a.sent();
-                _a.label = 3;
-            case 3: return [2 /*return*/];
+                if (!(index < config.languages.length)) return [3 /*break*/, 5];
+                language = config.languages[index];
+                if (language.folderName === sourceLanguage.folderName)
+                    return [3 /*break*/, 4];
+                return [4 /*yield*/, translateObject(resolver.content, sourceLanguage.value, language.value)];
+            case 3:
+                translated = _a.sent();
+                fileCreator.create(translated, resolver.varName, resolver.getFullPath(language.folderName));
+                loading.succeed(" Succesfully created ".concat(language.label, " translations").green);
+                _a.label = 4;
+            case 4:
+                index++;
+                return [3 /*break*/, 2];
+            case 5:
+                console.log('\n');
+                config.languages.forEach(function (language) {
+                    var languageLabel = "".concat(language.label, " translations");
+                    var path = resolver.getFullPath(language.folderName);
+                    console.log("".concat(languageLabel.blue, " => ").concat(path.yellow));
+                });
+                return [2 /*return*/];
         }
     });
 }); };
-program
-    .version("1.0.0")
-    .description("An utility cli to translating objects")
-    .action(function () { return bootstrap()
-    .catch(function (error) { return exceptionHandler(error); })
-    .finally(function () { return loadingBar().stop(); }); });
-program.command('config')
-    .description('Config the cli')
-    .action(function () { return setupApplication(); });
-program.parse(process.argv);
-//# sourceMappingURL=app.js.map
+//# sourceMappingURL=create-translations.js.map

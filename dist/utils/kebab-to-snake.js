@@ -1,6 +1,2 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.kebabToSnake = void 0;
-const kebabToSnake = (kebabCaseString) => kebabCaseString.replace(/-/g, '_');
-exports.kebabToSnake = kebabToSnake;
+export var kebabToSnake = function (kebabCaseString) { return kebabCaseString.replace(/-/g, '_'); };
 //# sourceMappingURL=kebab-to-snake.js.map

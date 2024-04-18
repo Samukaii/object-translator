@@ -1,5 +1,5 @@
-import {Generic} from "./stringify-object";
-import {Translation} from "../models/translation";
+import {Generic} from "./stringify-object.js";
+import {Translation} from "../models/translation.js";
 
 export const convertObjectToTranslations = (object: Generic): Translation[] => {
     const result: Translation[] = [];

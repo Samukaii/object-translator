@@ -1,8 +1,8 @@
-import config from "../config.json";
-import {kebabToSnake} from "../utils/kebab-to-snake";
-import {Generic} from "../utils/stringify-object";
-import {FileNotFoundError} from "../exceptions/file-not-found-error";
-import {CouldNotFoundVariable} from "../exceptions/could-not-found-variable";
+import config from "../config.json" assert {type: "json"};
+import {kebabToSnake} from "../utils/kebab-to-snake.js";
+import {Generic} from "../utils/stringify-object.js";
+import {FileNotFoundError} from "../exceptions/file-not-found-error.js";
+import {CouldNotFoundVariable} from "../exceptions/could-not-found-variable.js";
 import fs from "fs";
 
 const {sourceLanguage, basePath, translationSuffix} = config;

@@ -1,10 +1,9 @@
-import {Generic} from "./stringify-object";
-import {convertObjectToTranslations} from "./convert-object-to-translations";
-import {Translation} from "../models/translation";
+import {Generic} from "./stringify-object.js";
+import {convertObjectToTranslations} from "./convert-object-to-translations.js";
+import {Translation} from "../models/translation.js";
 import {translate, TranslationResult} from "bing-translate-api";
-import {convertTranslationsToObject} from "./convert-translations-to-object";
-
-import {CouldNotTranslateError} from "../exceptions/could-not-translate-error";
+import {convertTranslationsToObject} from "./convert-translations-to-object.js";
+import {CouldNotTranslateError} from "../exceptions/could-not-translate-error.js";
 
 const applyTranslation = (translations: Translation[], values: string[]) => {
     const copy: Translation[] = JSON.parse(JSON.stringify(translations));

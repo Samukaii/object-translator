@@ -1,12 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.convertTranslationsToObject = void 0;
-const convertTranslationsToObject = (data) => {
-    const result = {};
-    data.forEach(item => {
-        const keys = item.path.split('.');
-        let currentObj = result;
-        keys.forEach((key, index) => {
+export var convertTranslationsToObject = function (data) {
+    var result = {};
+    data.forEach(function (item) {
+        var keys = item.path.split('.');
+        var currentObj = result;
+        keys.forEach(function (key, index) {
             if (index === keys.length - 1) {
                 currentObj[key] = item.value;
             }
@@ -18,5 +15,4 @@ const convertTranslationsToObject = (data) => {
     });
     return result;
 };
-exports.convertTranslationsToObject = convertTranslationsToObject;
 //# sourceMappingURL=convert-translations-to-object.js.map

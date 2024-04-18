@@ -1,7 +1,7 @@
 import inquirer, {Question} from 'inquirer';
-import {allLanguages} from "../static/all-languages";
+import {allLanguages} from "../static/all-languages.js";
 import fs from "node:fs";
-import {Generic} from "../utils/stringify-object";
+import {Generic} from "../utils/stringify-object.js";
 
 
 const getLanguageInfo = (language: string) => {

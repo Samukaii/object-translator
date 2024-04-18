@@ -1,10 +1,24 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.FileNotFoundError = void 0;
-class FileNotFoundError extends Error {
-    constructor(path) {
-        super(`The file at path "${path}" was not found`);
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var FileNotFoundError = /** @class */ (function (_super) {
+    __extends(FileNotFoundError, _super);
+    function FileNotFoundError(path) {
+        return _super.call(this, "The file at path \"".concat(path, "\" was not found")) || this;
     }
-}
-exports.FileNotFoundError = FileNotFoundError;
+    return FileNotFoundError;
+}(Error));
+export { FileNotFoundError };
 //# sourceMappingURL=file-not-found-error.js.map

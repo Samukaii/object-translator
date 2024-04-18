@@ -1,12 +1,12 @@
 #! /usr/bin/env node
-import {CreateTranslationArgs} from "./models/create-translation-args";
+import {CreateTranslationArgs} from "./models/create-translation-args.js";
 import 'colors';
-import {exceptionHandler} from "./exceptions/exception-handler";
-import {loadingBar} from "./core/loading-bar";
+import {exceptionHandler} from "./exceptions/exception-handler.js";
+import {loadingBar} from "./core/loading-bar.js";
 import figlet from 'figlet';
 import {Command} from "commander";
-import {createTranslations} from "./commands/create-translations";
-import {setupApplication} from "./commands/setup-application";
+import {createTranslations} from "./commands/create-translations.js";
+import {setupApplication} from "./commands/setup-application.js";
 
 const program = new Command();
 
