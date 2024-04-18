@@ -3,33 +3,28 @@
 
 Translator é uma cli para a geração automática de traduções usando o Bing Translate
 
+## Instalação
+
+**Requisitos:** Node 16 ou superior
+
+```shell
+npm install -g @samukaii/translator
+```
+
 ## Como usar
+Execute o seguinte comando e siga as instruções
 
 ```shell
-git clone https://github.com/Samukaii/object-translator.git
-cd object-translator
+translator config
 ```
+![image](https://github.com/Samukaii/object-translator/assets/54710691/cdac1451-17f7-485e-acff-22a9c415af0c)
 
-Após isso abra o arquivo src/config.json e adicione as configurações desejadas e execute o script abaixo:
+Depois execute:
 
 ```shell
-npm run build && npm i -g .
+translator path-to/your-translation
 ```
 
-## Configurações
-![image](https://github.com/Samukaii/object-translator/assets/54710691/6f853f45-f654-4887-ad68-80a6e411fab4)
+Você não precisa adicionar "-translate" no final. Ele será inserido automaticamente
 
-### basePath
-Aqui você define em qual pasta o seu arquivo de tradução será pesquisado e também onde serão criadas as traduções
-
-### translationSuffix
-Defina qual será o sufixo usado nas suas traduções. 
-Ex: Se o sufixo for "translate" a CLI irá buscar por um arquivo que termina com -translate e também irá gerar as traduções com este sufixo
-
-Deixe uma string vazia se não quiser usar sufixos
-
-### sourceLanguage
-Define a linguagem que a CLI usará como fonte para gerar as demais traduções
-
-### languages
-Define quais linguagens serão traduzidas
+![image](https://github.com/Samukaii/object-translator/assets/54710691/424058b5-c7e2-4333-aae9-36b3323247b3)
