@@ -1,49 +1,36 @@
 #! /usr/bin/env node
-import {translateObject} from "./utils/translate-object";
-import config from "./config.json";
-import {ApplicationConfig} from "./models/application-config";
-import {fileCreator} from "./core/file-creator";
-import {createPathResolver} from "./core/path-resolver";
+import {CreateTranslationArgs} from "./models/create-translation-args";
 import 'colors';
+import {exceptionHandler} from "./exceptions/exception-handler";
 import {loadingBar} from "./core/loading-bar";
+import figlet from 'figlet';
+import {Command} from "commander";
+import {createTranslations} from "./commands/create-translations";
+import {setupApplication} from "./commands/setup-application";
 
-export const startApplication = async (args: ApplicationConfig) => {
-    const {file} = args;
-    const loading = loadingBar();
+const program = new Command();
 
-    const resolver = await createPathResolver(file);
+console.log(figlet.textSync("Translator").cyan);
 
-    const {sourceLanguage} = config;
+const bootstrap = async () => {
+    const args: CreateTranslationArgs = {
+        file: process.argv[2],
+    };
 
-    loading.start();
+    if (!args.file) program.outputHelp();
+    else await createTranslations(args);
+}
 
-    for (let index = 0; index < config.languages.length; index++) {
-        const language = config.languages[index];
+program
+    .version("1.0.0")
+    .description("An utility cli to translating objects")
+    .action(() => bootstrap()
+        .catch((error: Error) => exceptionHandler(error))
+        .finally(() => loadingBar().stop())
+    )
 
-        if (language.folderName === sourceLanguage.folderName) continue;
+program.command('config')
+    .description('Config the cli')
+    .action(() => setupApplication());
 
-        const translated = await translateObject(
-            resolver.content,
-            sourceLanguage.value,
-            language.value
-        );
-
-        fileCreator.create(
-            translated,
-            resolver.varName,
-            resolver.getFullPath(language.folderName)
-        );
-
-
-        loading.succeed(` Succesfully created ${language.label} translations`.green);
-    }
-
-    console.log('\n');
-
-    config.languages.forEach(language => {
-        const languageLabel = `${language.label} translations`;
-        const path = resolver.getFullPath(language.folderName);
-
-        console.log(`${languageLabel.blue} => ${path.yellow}`);
-    });
-};
+program.parse(process.argv);
