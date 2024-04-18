@@ -72,12 +72,12 @@ const askFolderNames = async (languages: {label: string; value: string}[]) => {
 
 const saveConfig = (config: Generic) => {
     loadingBar().start();
-    const file = 'src/config.json';
+    const fullPath = path.resolve('../config.json');
+
     const content = JSON.stringify(config, null, 2);
 
-    fs.writeFileSync(file, content);
+    fs.writeFileSync(fullPath, content);
 
-    const fullPath = path.resolve(file);
 
     console.log('');
     loadingBar().succeed(' Configurations updated succesfully!'.green);
