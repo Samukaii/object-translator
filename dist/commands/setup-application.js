@@ -124,7 +124,8 @@ var askFolderNames = function (languages) { return __awaiter(void 0, void 0, voi
 }); };
 var saveConfig = function (config) {
     loadingBar().start();
-    var fullPath = path.resolve('../config.json');
+    var fullPath = path.dirname(__filename);
+    console.log(fullPath);
     var content = JSON.stringify(config, null, 2);
     fs.writeFileSync(fullPath, content);
     console.log('');
