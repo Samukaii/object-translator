@@ -43,7 +43,7 @@ import { Command } from "commander";
 import { createTranslations } from "./commands/create-translations.js";
 import { setupApplication } from "./commands/setup-application.js";
 var program = new Command();
-console.log(figlet.textSync("Translator").random);
+console.log(figlet.textSync("Translator").blue);
 var bootstrap = function () { return __awaiter(void 0, void 0, void 0, function () {
     var args;
     return __generator(this, function (_a) {
