@@ -6,7 +6,6 @@ import path from "node:path";
 import {loadingBar} from "../core/loading-bar.js";
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
-
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const getLanguageInfo = (language: string) => {
@@ -75,9 +74,7 @@ const askFolderNames = async (languages: {label: string; value: string}[]) => {
 
 const saveConfig = (config: Generic) => {
     loadingBar().start();
-    const fullPath = path.resolve(__dirname, 'settings.json');
-    console.log(fullPath);
-
+    const fullPath = path.resolve(__dirname, 'config.json');
 
     const content = JSON.stringify(config, null, 2);
 
