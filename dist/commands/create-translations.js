@@ -36,21 +36,22 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 import { loadingBar } from "../core/loading-bar.js";
 import { createPathResolver } from "../core/path-resolver.js";
-import config from "../config.json" assert { type: "json" };
 import { translateObject } from "../utils/translate-object.js";
 import { fileCreator } from "../core/file-creator.js";
+import { applicationConfig } from "../core/application-config.js";
 var joinItems = function (items) {
     var last = items.pop();
     return "".concat(items.join(", ")).concat(last ? ' and ' + last : '');
 };
-var sourceLanguage = config.sourceLanguage.label;
-var languages = joinItems(config.languages.map(function (language) { return language.label; }));
-var message = "Translating ".concat(sourceLanguage, " to ").concat(languages).blue;
 export var createTranslations = function (args) { return __awaiter(void 0, void 0, void 0, function () {
-    var file, loading, resolver, sourceLanguage, index, language, translated;
+    var config, sourceLanguageLabel, languages, message, file, loading, resolver, sourceLanguage, index, language, translated;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
+                config = applicationConfig.get();
+                sourceLanguageLabel = config.sourceLanguage.label;
+                languages = joinItems(config.languages.map(function (language) { return language.label; }));
+                message = "Translating ".concat(sourceLanguageLabel, " to ").concat(languages).blue;
                 file = args.file;
                 loading = loadingBar();
                 return [4 /*yield*/, createPathResolver(file)];

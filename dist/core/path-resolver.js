@@ -34,12 +34,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-import config from "../config.json" assert { type: "json" };
 import { kebabToSnake } from "../utils/kebab-to-snake.js";
 import { FileNotFoundError } from "../exceptions/file-not-found-error.js";
 import { CouldNotFoundVariable } from "../exceptions/could-not-found-variable.js";
 import fs from "fs";
-var sourceLanguage = config.sourceLanguage, basePath = config.basePath, translationSuffix = config.translationSuffix;
+import { applicationConfig } from "./application-config.js";
 var importVariable = function (varName, path) {
     var _a;
     var content = fs.readFileSync(path, 'utf8');
@@ -51,11 +50,12 @@ var importVariable = function (varName, path) {
         _a;
 };
 export var createPathResolver = function (fileName) { return __awaiter(void 0, void 0, void 0, function () {
-    var file, parentPath, suffix, splinted, getFullPath, result, sourceLanguagePath, varName;
+    var config, file, parentPath, suffix, splinted, getFullPath, result, sourceLanguagePath, varName;
     return __generator(this, function (_a) {
+        config = applicationConfig.get();
         file = fileName;
         parentPath = "";
-        suffix = translationSuffix ? '-' + translationSuffix : '';
+        suffix = config.translationSuffix ? '-' + config.translationSuffix : '';
         if (fileName.includes("/")) {
             splinted = fileName.split("/");
             file = splinted.at(-1);
@@ -64,9 +64,9 @@ export var createPathResolver = function (fileName) { return __awaiter(void 0, v
         getFullPath = function (language) {
             var parentPathConcat = parentPath ? "".concat(parentPath, "/") : '';
             file = file.replace(suffix, "");
-            return "".concat(basePath, "/").concat(language, "/").concat(parentPathConcat).concat(file).concat(suffix, ".ts");
+            return "".concat(config.basePath, "/").concat(language, "/").concat(parentPathConcat).concat(file).concat(suffix, ".ts");
         };
-        sourceLanguagePath = getFullPath(sourceLanguage.folderName);
+        sourceLanguagePath = getFullPath(config.sourceLanguage.folderName);
         varName = kebabToSnake("".concat(file).concat(suffix)).toUpperCase();
         try {
             result = importVariable(varName, sourceLanguagePath);

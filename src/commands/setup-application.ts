@@ -1,12 +1,9 @@
 import inquirer, {Question} from 'inquirer';
 import {allLanguages} from "../static/all-languages.js";
-import fs from "node:fs";
 import {Generic} from "../utils/stringify-object.js";
-import path from "node:path";
 import {loadingBar} from "../core/loading-bar.js";
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-const __dirname = dirname(fileURLToPath(import.meta.url));
+import {applicationConfig} from "../core/application-config.js";
+import {ApplicatonConfig} from "../models/applicaton-config.js";
 
 const getLanguageInfo = (language: string) => {
     const [label, value] = language.split('-');
@@ -48,7 +45,7 @@ const askDefaultConfig = () => {
             pageSize: 25,
             message: 'Wich languages do you want to translate?',
             filter: (input: string[]) => input.map(getLanguageInfo),
-            choices: (answers) => allLanguages
+            choices: (answers: any) => allLanguages
                 .filter(language => language.value !== answers.sourceLanguage.value)
                 .map(input => `${input.label} - (${input.value})`),
             validate: (input: Generic[]) => !input.length ? "You must select at least one language" : true
@@ -56,8 +53,8 @@ const askDefaultConfig = () => {
     ]);
 }
 
-const askFolderNames = async (languages: {label: string; value: string}[]) => {
-    const folders = await inquirer.prompt(languages.map((language: {label: string; value: string;}) => {
+const askFolderNames = async (languages: { label: string; value: string }[]) => {
+    const folders = await inquirer.prompt(languages.map((language: { label: string; value: string; }) => {
         return {
             type: "input",
             name: language.value,
@@ -74,16 +71,12 @@ const askFolderNames = async (languages: {label: string; value: string}[]) => {
 
 const saveConfig = (config: Generic) => {
     loadingBar().start();
-    const fullPath = path.resolve(__dirname, '../config.json');
 
-    const content = JSON.stringify(config, null, 2);
-
-    fs.writeFileSync(fullPath, content);
-
+    applicationConfig.save(config as ApplicatonConfig);
 
     console.log('');
     loadingBar().succeed(' Configurations updated succesfully!'.green);
-    console.log(`File: ${fullPath}`.yellow);
+    console.log(`File: ${applicationConfig.filePath()}`.yellow);
     console.log('');
 }
 

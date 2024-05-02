@@ -1,11 +1,9 @@
-import config from "../config.json" assert {type: "json"};
 import {kebabToSnake} from "../utils/kebab-to-snake.js";
 import {Generic} from "../utils/stringify-object.js";
 import {FileNotFoundError} from "../exceptions/file-not-found-error.js";
 import {CouldNotFoundVariable} from "../exceptions/could-not-found-variable.js";
 import fs from "fs";
-
-const {sourceLanguage, basePath, translationSuffix} = config;
+import {applicationConfig} from "./application-config.js";
 
 
 const importVariable = (varName: string, path: string) => {
@@ -22,9 +20,11 @@ const importVariable = (varName: string, path: string) => {
 }
 
 export const createPathResolver = async (fileName: string) => {
+    const config = applicationConfig.get();
+
     let file = fileName;
     let parentPath = "";
-    const suffix = translationSuffix ? '-' + translationSuffix : '';
+    const suffix = config.translationSuffix ? '-' + config.translationSuffix : '';
 
     if (fileName.includes("/")) {
         const splinted = fileName.split("/");
@@ -37,11 +37,11 @@ export const createPathResolver = async (fileName: string) => {
         const parentPathConcat = parentPath ? `${parentPath}/` : '';
         file = file.replace(suffix, "");
 
-        return `${basePath}/${language}/${parentPathConcat}${file}${suffix}.ts`;
+        return `${config.basePath}/${language}/${parentPathConcat}${file}${suffix}.ts`;
     }
 
     let result: Generic;
-    const sourceLanguagePath = getFullPath(sourceLanguage.folderName);
+    const sourceLanguagePath = getFullPath(config.sourceLanguage.folderName);
     const varName = kebabToSnake(`${file}${suffix}`).toUpperCase();
 
     try {

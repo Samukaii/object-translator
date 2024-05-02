@@ -1,9 +1,9 @@
 import {CreateTranslationArgs} from "../models/create-translation-args.js";
 import {loadingBar} from "../core/loading-bar.js";
 import {createPathResolver} from "../core/path-resolver.js";
-import config from "../config.json" assert {type: "json"};
 import {translateObject} from "../utils/translate-object.js";
 import {fileCreator} from "../core/file-creator.js";
+import {applicationConfig} from "../core/application-config.js";
 
 const joinItems = (items: string[]) => {
     const last = items.pop();
@@ -11,12 +11,15 @@ const joinItems = (items: string[]) => {
     return `${items.join(", ")}${last ? ' and ' + last : ''}`;
 }
 
-const sourceLanguage = config.sourceLanguage.label;
-const languages = joinItems(config.languages.map(language => language.label));
-
-const message = `Translating ${sourceLanguage} to ${languages}`.blue;
-
 export const createTranslations = async (args: CreateTranslationArgs) => {
+    const config = applicationConfig.get();
+
+    const sourceLanguageLabel = config.sourceLanguage.label;
+    const languages = joinItems(config.languages.map(language => language.label));
+
+    const message = `Translating ${sourceLanguageLabel} to ${languages}`.blue;
+
+
     const {file} = args;
     const loading = loadingBar();
 

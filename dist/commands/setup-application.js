@@ -56,12 +56,8 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 };
 import inquirer from 'inquirer';
 import { allLanguages } from "../static/all-languages.js";
-import fs from "node:fs";
-import path from "node:path";
 import { loadingBar } from "../core/loading-bar.js";
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-var __dirname = dirname(fileURLToPath(import.meta.url));
+import { applicationConfig } from "../core/application-config.js";
 var getLanguageInfo = function (language) {
     var _a = language.split('-'), label = _a[0], value = _a[1];
     var withoutParentesis = value
@@ -127,12 +123,10 @@ var askFolderNames = function (languages) { return __awaiter(void 0, void 0, voi
 }); };
 var saveConfig = function (config) {
     loadingBar().start();
-    var fullPath = path.resolve(__dirname, '../config.json');
-    var content = JSON.stringify(config, null, 2);
-    fs.writeFileSync(fullPath, content);
+    applicationConfig.save(config);
     console.log('');
     loadingBar().succeed(' Configurations updated succesfully!'.green);
-    console.log("File: ".concat(fullPath).yellow);
+    console.log("File: ".concat(applicationConfig.filePath()).yellow);
     console.log('');
 };
 export var setupApplication = function () { return __awaiter(void 0, void 0, void 0, function () {
