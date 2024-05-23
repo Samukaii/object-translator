@@ -4,96 +4,111 @@ import {Generic} from "../utils/stringify-object.js";
 import {loadingBar} from "../core/loading-bar.js";
 import {applicationConfig} from "../core/application-config.js";
 import {ApplicatonConfig} from "../models/applicaton-config.js";
+import {createPathResolver} from "../core/path-resolver.js";
+import prompt = inquirer.prompt;
+import {convertObjectToTranslations} from "../utils/convert-object-to-translations.js";
+import {Translation} from "../models/translation.js";
+import {convertTranslationsToObject} from "../utils/convert-translations-to-object.js";
+import {patchTranslations} from "../core/patch-translations.js";
 
-const getLanguageInfo = (language: string) => {
-    const [label, value] = language.split('-');
-    const withoutParentesis = value
-        .replace('(', '')
-        .replace(')', '');
+enum TranslationActions {
+    FINISH = 1 ,
+    CONTINUE,
+    CANCEL,
+    CHOOSE_PATH
+}
 
-    return {
-        label: label.trim(),
-        value: withoutParentesis.trim()
+let filePath: string;
+let allTranslations: Translation[] = [];
+
+const chooseFile = async () => {
+    const result = await inquirer.prompt([
+        {
+            type: "input",
+            name: "path",
+            message: "Choose a file path to translate",
+        },
+    ]);
+
+    filePath = result['path'];
+}
+
+const add = async () => {
+    if(!filePath) await chooseFile();
+
+    const asks = inquirer.prompt([
+        {
+            type: "input",
+            name: "translationPath",
+            message: "Choose a translation path",
+        },
+        {
+            type: "input",
+            name: "translation",
+            message: "What is the translation? (in source language)"
+        }
+    ]);
+    const result = await asks;
+
+    allTranslations.unshift({
+        path: result.translationPath,
+        value: result.translation,
+    });
+}
+
+const finish = async () => {
+    await patchTranslations(filePath, allTranslations);
+}
+
+
+const chooseAction = async () => {
+    const asks = await inquirer.prompt([
+        {
+            type: "list",
+            name: "action",
+            message: "What do you want to do?",
+            choices: [
+                {
+                    value: TranslationActions.FINISH,
+                    name: "Finalizar"
+                },
+                {
+                    value: TranslationActions.CONTINUE,
+                    name: "Prosseguir"
+                },
+                {
+                    value: TranslationActions.CANCEL,
+                    name: "Cancelar"
+                },
+                {
+                    value: TranslationActions.CHOOSE_PATH,
+                    name: "Escolher outro arquivo"
+                }
+            ]
+        },
+    ]);
+
+    const action = asks['action'] as TranslationActions;
+
+    switch (action) {
+        case TranslationActions.FINISH:
+            finish();
+            break;
+        case TranslationActions.CANCEL:
+            break;
+        case TranslationActions.CONTINUE:
+            await add();
+            await chooseAction();
+            break;
+        case TranslationActions.CHOOSE_PATH:
+            await chooseFile();
+            await chooseAction();
+            break;
     }
 }
 
-const askDefaultConfig = () => {
-    return inquirer.prompt([
-        {
-            type: 'input',
-            name: 'basePath',
-            message: "What path do you want to find/generate translations?",
-            default: process.cwd()
-        },
-        {
-            type: 'input',
-            name: 'translationSuffix',
-            message: "Do you want to use a suffix to find/generate translations?",
-            default: 'translate'
-        },
-        {
-            type: 'list',
-            name: 'sourceLanguage',
-            pageSize: 25,
-            message: 'What will be your main language?',
-            filter: (input: string) => getLanguageInfo(input),
-            choices: allLanguages.map(input => `${input.label} - (${input.value})`)
-        },
-        {
-            type: 'checkbox',
-            name: 'languages',
-            pageSize: 25,
-            message: 'Wich languages do you want to translate?',
-            filter: (input: string[]) => input.map(getLanguageInfo),
-            choices: (answers: any) => allLanguages
-                .filter(language => language.value !== answers.sourceLanguage.value)
-                .map(input => `${input.label} - (${input.value})`),
-            validate: (input: Generic[]) => !input.length ? "You must select at least one language" : true
-        },
-    ]);
-}
-
-const askFolderNames = async (languages: { label: string; value: string }[]) => {
-    const folders = await inquirer.prompt(languages.map((language: { label: string; value: string; }) => {
-        return {
-            type: "input",
-            name: language.value,
-            message: `Choose a folder for ${language.label}`,
-            default: language.value
-        } as Question
-    }));
-
-    return languages.map(language => ({
-        ...language,
-        folderName: folders[language.value]
-    }));
-}
-
-const saveConfig = (config: Generic) => {
-    loadingBar().start();
-
-    applicationConfig.save(config as ApplicatonConfig);
-
-    console.log('');
-    loadingBar().succeed(' Configurations updated succesfully!'.green);
-    console.log(`File: ${applicationConfig.filePath()}`.yellow);
-    console.log('');
-}
-
-export const setupApplication = async () => {
-    const basicConfig = await askDefaultConfig();
-
-    const languages = await askFolderNames([
-        basicConfig.sourceLanguage,
-        ...basicConfig.languages
-    ]);
-
-    const fullConfig = {
-        ...basicConfig,
-        sourceLanguage: languages[0],
-        languages: languages.slice(1)
-    };
-
-
-    saveConfig(fullConfig);
+export const addTranslation = async () => {
+    await chooseFile();
+    await add();
+    await chooseAction();
 }

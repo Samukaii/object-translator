@@ -8,6 +8,7 @@ import figlet from 'figlet';
 import {Command} from "commander";
 import {createTranslations} from "./commands/create-translations.js";
 import {setupApplication} from "./commands/setup-application.js";
+import {addTranslation} from "./commands/add-translation.js";
 
 const program = new Command();
 
@@ -33,5 +34,9 @@ program
 program.command('config')
     .description('Setup the aplication')
     .action(() => setupApplication());
+
+program.command('creator')
+    .description('Open a translation creator')
+    .action(() => addTranslation());
 
 program.parse(process.argv);

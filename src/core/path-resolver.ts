@@ -6,6 +6,8 @@ import fs from "fs";
 import {applicationConfig} from "./application-config.js";
 
 
+
+
 const importVariable = (varName: string, path: string) => {
     const content = fs.readFileSync(path, 'utf8');
 
@@ -55,10 +57,16 @@ export const createPathResolver = async (fileName: string) => {
     if(!result[varName])
         throw new CouldNotFoundVariable(varName, sourceLanguagePath);
 
+    const byLanguage = (language: string) => {
+        const sourceLanguagePath = getFullPath(language);
+        return importVariable(varName, sourceLanguagePath);
+    }
+
 
     return {
         getFullPath,
         varName,
+        byLanguage,
         content: result[varName]
     }
 };
