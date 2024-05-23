@@ -50,7 +50,7 @@ var importVariable = function (varName, path) {
         _a;
 };
 export var createPathResolver = function (fileName) { return __awaiter(void 0, void 0, void 0, function () {
-    var config, file, parentPath, suffix, splinted, getFullPath, result, sourceLanguagePath, varName;
+    var config, file, parentPath, suffix, splinted, getFullPath, result, sourceLanguagePath, varName, byLanguage;
     return __generator(this, function (_a) {
         config = applicationConfig.get();
         file = fileName;
@@ -76,9 +76,14 @@ export var createPathResolver = function (fileName) { return __awaiter(void 0, v
         }
         if (!result[varName])
             throw new CouldNotFoundVariable(varName, sourceLanguagePath);
+        byLanguage = function (language) {
+            var sourceLanguagePath = getFullPath(language);
+            return importVariable(varName, sourceLanguagePath);
+        };
         return [2 /*return*/, {
                 getFullPath: getFullPath,
                 varName: varName,
+                byLanguage: byLanguage,
                 content: result[varName]
             }];
     });

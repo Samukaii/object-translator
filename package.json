@@ -1,6 +1,6 @@
 {
   "folderName": "translations",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "name": "@samukaii/translator",
   "description": "",
   "main": "dist/app.js",
