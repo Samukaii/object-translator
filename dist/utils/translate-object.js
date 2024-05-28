@@ -46,26 +46,60 @@ var applyTranslation = function (translations, values) {
     });
     return copy;
 };
+var cropText = function (text, limit) {
+    if (limit === void 0) { limit = 1000; }
+    var terms = text.split(';');
+    var groups = [];
+    var currentGroup = '';
+    for (var _i = 0, terms_1 = terms; _i < terms_1.length; _i++) {
+        var term = terms_1[_i];
+        if (currentGroup.length + term.length + 1 <= limit) {
+            currentGroup += (currentGroup ? ';' : '') + term;
+        }
+        else {
+            groups.push(currentGroup);
+            currentGroup = term;
+        }
+    }
+    if (currentGroup) {
+        groups.push(currentGroup);
+    }
+    return groups;
+};
 export var translateObject = function (object, from, to) { return __awaiter(void 0, void 0, void 0, function () {
-    var asTranslations, asPlainText, result, e_1, resultAsArray, asTranslationsAgain;
-    var _a;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
+    var asTranslations, asPlainText, totalResult, cropped, results, asArray, e_1, resultAsArray, asTranslationsAgain;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
             case 0:
                 asTranslations = convertObjectToTranslations(object);
                 asPlainText = asTranslations.map(function (translation) { return translation.value; }).join(";");
-                _b.label = 1;
+                totalResult = "";
+                _a.label = 1;
             case 1:
-                _b.trys.push([1, 3, , 4]);
-                return [4 /*yield*/, translate(asPlainText, from, to)];
+                _a.trys.push([1, 3, , 4]);
+                cropped = cropText(asPlainText);
+                results = cropped.map(function (group) { return __awaiter(void 0, void 0, void 0, function () {
+                    var translated;
+                    var _a;
+                    return __generator(this, function (_b) {
+                        switch (_b.label) {
+                            case 0: return [4 /*yield*/, translate(group, from, to)];
+                            case 1:
+                                translated = _b.sent();
+                                return [2 /*return*/, (_a = translated === null || translated === void 0 ? void 0 : translated.translation) !== null && _a !== void 0 ? _a : ''];
+                        }
+                    });
+                }); });
+                return [4 /*yield*/, Promise.all(results)];
             case 2:
-                result = _b.sent();
+                asArray = _a.sent();
+                totalResult = asArray.join('');
                 return [3 /*break*/, 4];
             case 3:
-                e_1 = _b.sent();
+                e_1 = _a.sent();
                 throw new CouldNotTranslateError(e_1);
             case 4:
-                resultAsArray = ((_a = result === null || result === void 0 ? void 0 : result.translation) !== null && _a !== void 0 ? _a : "").split(";").map(function (text) { return text.trim(); });
+                resultAsArray = (totalResult).split(";").map(function (text) { return text.trim(); });
                 asTranslationsAgain = applyTranslation(asTranslations, resultAsArray);
                 return [2 /*return*/, convertTranslationsToObject(asTranslationsAgain)];
         }

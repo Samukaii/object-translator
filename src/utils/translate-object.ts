@@ -16,21 +16,52 @@ const applyTranslation = (translations: Translation[], values: string[]) => {
     return copy;
 }
 
+const cropText = (text: string, limit = 1000) => {
+    const terms = text.split(';');
+    const groups = [];
+    let currentGroup = '';
+
+    for (const term of terms) {
+        if (currentGroup.length + term.length + 1 <= limit) {
+            currentGroup += (currentGroup ? ';' : '') + term;
+        } else {
+            groups.push(currentGroup);
+            currentGroup = term;
+        }
+    }
+
+    if (currentGroup) {
+        groups.push(currentGroup);
+    }
+
+    return groups;
+}
+
 export const translateObject = async (object: Generic, from: string, to: string) => {
     const asTranslations = convertObjectToTranslations(object);
 
     const asPlainText = asTranslations.map(translation => translation.value).join(";");
 
-    let result: TranslationResult | undefined;
+    let totalResult = "";
 
     try {
-        result = await translate(asPlainText, from, to);
+        const cropped = cropText(asPlainText)
+
+        const results = cropped.map(async group => {
+            const translated = await translate(group, from, to);
+
+            return translated?.translation ?? '';
+        });
+
+        const asArray = await Promise.all(results);
+
+        totalResult = asArray.join('');
     }
     catch (e) {
         throw new CouldNotTranslateError(e as Error);
     }
 
-    const resultAsArray = (result?.translation ?? "").split(";").map(text => text.trim());
+    const resultAsArray = (totalResult).split(";").map(text => text.trim());
 
     const asTranslationsAgain = applyTranslation(asTranslations, resultAsArray);
 
