@@ -9,10 +9,14 @@ import {Command} from "commander";
 import {createTranslations} from "./commands/create-translations.js";
 import {setupApplication} from "./commands/setup-application.js";
 import {addTranslation} from "./commands/add-translation.js";
+import inquirer from "inquirer";
+import inquirerPrompt from 'inquirer-autocomplete-prompt';
 
 const program = new Command();
 
 console.log(figlet.textSync("Translator").blue);
+
+inquirer.registerPrompt('autocomplete', inquirerPrompt);
 
 const bootstrap = async () => {
     const args: CreateTranslationArgs = {

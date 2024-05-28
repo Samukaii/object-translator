@@ -1,6 +1,6 @@
 {
   "folderName": "translations",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "name": "@samukaii/translator",
   "description": "",
   "main": "dist/app.js",
@@ -28,6 +28,7 @@
     "@types/commander": "^2.12.2",
     "@types/figlet": "^1.5.8",
     "@types/inquirer": "^9.0.7",
+    "@types/inquirer-autocomplete-prompt": "^3.0.3",
     "@types/minimist": "^1.2.5",
     "@types/node": "^20.12.7",
     "nodemon": "^3.1.0",
@@ -41,6 +42,7 @@
     "commander": "^12.0.0",
     "figlet": "^1.7.0",
     "inquirer": "^9.2.19",
+    "inquirer-autocomplete-prompt": "^3.0.1",
     "loading-cli": "^1.1.2",
     "minimist": "^1.2.8"
   }

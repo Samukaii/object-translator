@@ -4,17 +4,32 @@ import {FileNotFoundError} from "../exceptions/file-not-found-error.js";
 import {CouldNotFoundVariable} from "../exceptions/could-not-found-variable.js";
 import fs from "fs";
 import {applicationConfig} from "./application-config.js";
+import {BadFormatFileError} from "../exceptions/bad-format-file-error.js";
 
 
 
 
 const importVariable = (varName: string, path: string) => {
-    const content = fs.readFileSync(path, 'utf8');
+    let content = '';
 
-    const value = content.substring(content.indexOf('{'), content.lastIndexOf('}') + 1);
+    try {
+        content = fs.readFileSync(path, 'utf8');
+    }
+    catch (e) {
+        throw new FileNotFoundError(path);
+    }
+
+
+    let value = content.substring(content.indexOf(`{`), content.lastIndexOf('}') + 1);
 
     let variable: Generic = {};
-    eval(`variable = ${value}`);
+
+    try {
+        eval(`variable = ${value}`);
+    }
+    catch (e) {
+        throw new BadFormatFileError(path);
+    }
 
     return {
         [varName]: variable
@@ -50,7 +65,7 @@ export const createPathResolver = async (fileName: string) => {
         result = importVariable(varName, sourceLanguagePath);
     }
     catch (e) {
-        throw new FileNotFoundError(sourceLanguagePath);
+        throw e;
     }
 
 
@@ -67,6 +82,7 @@ export const createPathResolver = async (fileName: string) => {
         getFullPath,
         varName,
         byLanguage,
+        bySourceLanguage: () => byLanguage(config.sourceLanguage.folderName),
         content: result[varName]
     }
 };

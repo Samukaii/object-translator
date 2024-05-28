@@ -1,6 +1,9 @@
 import inquirer from 'inquirer';
 import {Translation} from "../models/translation.js";
 import {patchTranslations} from "../core/patch-translations.js";
+import {getDirectories} from "../core/get-directories.js";
+import {createPathResolver} from "../core/path-resolver.js";
+import {convertObjectToTranslations} from "../utils/convert-object-to-translations.js";
 
 enum TranslationActions {
     FINISH = 1,
@@ -13,11 +16,16 @@ let filePath: string;
 let allTranslations: Translation[] = [];
 
 const chooseFile = async () => {
+    const directories = getDirectories();
+
     const result = await inquirer.prompt([
         {
-            type: "input",
+            type: "autocomplete",
             name: "path",
             message: "Choose a file path to translate",
+            source: (_answers: any, input: string) => directories.filter(directory => {
+                return directory.toLowerCase().includes(input?.toLowerCase() ?? "");
+            }),
         },
     ]);
 
@@ -25,15 +33,29 @@ const chooseFile = async () => {
 }
 
 
-
 const add = async () => {
     if (!filePath) await chooseFile();
+    const resolver = await createPathResolver(filePath);
+    const object = resolver.bySourceLanguage();
+    const translations = convertObjectToTranslations(object[resolver.varName]).map(translation => {
+        return translation.path
+    });
 
     const asks = inquirer.prompt([
         {
-            type: "input",
+            type: "autocomplete",
             name: "translationPath",
-            message: "Choose a translation path",
+            message: "Choose a file path to translate",
+            source: (_answers: any, input: string) => {
+                const filtered = translations.filter(directory => {
+                    return directory.toLowerCase().includes(input?.toLowerCase() ?? "");
+                });
+
+                return [
+                    input ?? '',
+                    ...filtered
+                ];
+            },
         },
         {
             type: "input",
