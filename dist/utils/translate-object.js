@@ -46,15 +46,16 @@ var applyTranslation = function (translations, values) {
     });
     return copy;
 };
+var separator = ' # ';
 var cropText = function (text, limit) {
     if (limit === void 0) { limit = 1000; }
-    var terms = text.split(';');
+    var terms = text.split(separator);
     var groups = [];
     var currentGroup = '';
     for (var _i = 0, terms_1 = terms; _i < terms_1.length; _i++) {
         var term = terms_1[_i];
         if (currentGroup.length + term.length + 1 <= limit) {
-            currentGroup += (currentGroup ? ';' : '') + term;
+            currentGroup += (currentGroup ? separator : '') + term;
         }
         else {
             groups.push(currentGroup);
@@ -72,7 +73,7 @@ export var translateObject = function (object, from, to) { return __awaiter(void
         switch (_a.label) {
             case 0:
                 asTranslations = convertObjectToTranslations(object);
-                asPlainText = asTranslations.map(function (translation) { return translation.value; }).join(";");
+                asPlainText = asTranslations.map(function (translation) { return translation.value; }).join(separator);
                 totalResult = "";
                 _a.label = 1;
             case 1:
@@ -83,7 +84,7 @@ export var translateObject = function (object, from, to) { return __awaiter(void
                     var _a;
                     return __generator(this, function (_b) {
                         switch (_b.label) {
-                            case 0: return [4 /*yield*/, translate(group, from, to)];
+                            case 0: return [4 /*yield*/, translate(group, from, to, undefined, true)];
                             case 1:
                                 translated = _b.sent();
                                 return [2 /*return*/, (_a = translated === null || translated === void 0 ? void 0 : translated.translation) !== null && _a !== void 0 ? _a : ''];
@@ -99,7 +100,7 @@ export var translateObject = function (object, from, to) { return __awaiter(void
                 e_1 = _a.sent();
                 throw new CouldNotTranslateError(e_1);
             case 4:
-                resultAsArray = (totalResult).split(";").map(function (text) { return text.trim(); });
+                resultAsArray = (totalResult).split(separator).map(function (text) { return text.trim(); });
                 asTranslationsAgain = applyTranslation(asTranslations, resultAsArray);
                 return [2 /*return*/, convertTranslationsToObject(asTranslationsAgain)];
         }
