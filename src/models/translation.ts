@@ -1,4 +1,4 @@
 export interface Translation {
     path: string;
-    value: string
+    value: string;
 }

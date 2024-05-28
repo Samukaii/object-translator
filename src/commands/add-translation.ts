@@ -1,18 +1,9 @@
-import inquirer, {Question} from 'inquirer';
-import {allLanguages} from "../static/all-languages.js";
-import {Generic} from "../utils/stringify-object.js";
-import {loadingBar} from "../core/loading-bar.js";
-import {applicationConfig} from "../core/application-config.js";
-import {ApplicatonConfig} from "../models/applicaton-config.js";
-import {createPathResolver} from "../core/path-resolver.js";
-import prompt = inquirer.prompt;
-import {convertObjectToTranslations} from "../utils/convert-object-to-translations.js";
+import inquirer from 'inquirer';
 import {Translation} from "../models/translation.js";
-import {convertTranslationsToObject} from "../utils/convert-translations-to-object.js";
 import {patchTranslations} from "../core/patch-translations.js";
 
 enum TranslationActions {
-    FINISH = 1 ,
+    FINISH = 1,
     CONTINUE,
     CANCEL,
     CHOOSE_PATH
@@ -33,8 +24,10 @@ const chooseFile = async () => {
     filePath = result['path'];
 }
 
+
+
 const add = async () => {
-    if(!filePath) await chooseFile();
+    if (!filePath) await chooseFile();
 
     const asks = inquirer.prompt([
         {

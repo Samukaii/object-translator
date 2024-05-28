@@ -1,14 +1,3 @@
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -56,39 +45,12 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 };
 import { createPathResolver } from "./path-resolver.js";
 import { applicationConfig } from "./application-config.js";
-import { translate } from "bing-translate-api";
 import { convertObjectToTranslations } from "../utils/convert-object-to-translations.js";
 import { fileCreator } from "./file-creator.js";
 import { convertTranslationsToObject } from "../utils/convert-translations-to-object.js";
-var removeDuplicate = function (translations) {
-    var paths = [];
-    return translations.filter(function (translation) {
-        if (paths.includes(translation.path))
-            return false;
-        paths.push(translation.path);
-        return true;
-    });
-};
-var translateList = function (translations, language) { return __awaiter(void 0, void 0, void 0, function () {
-    var sourceLanguage, result;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                sourceLanguage = applicationConfig.get().sourceLanguage;
-                return [4 /*yield*/, translate("Casa", 'pt', 'en')];
-            case 1:
-                result = _a.sent();
-                console.log(result);
-                return [2 /*return*/, Promise.all(translations.map(function (translation) { return __awaiter(void 0, void 0, void 0, function () {
-                        return __generator(this, function (_a) {
-                            if (!result)
-                                throw new Error("Something went wrong while translating: \"".concat(translation.value, "\" to ").concat(language));
-                            return [2 /*return*/, __assign(__assign({}, translation), { value: result.translation })];
-                        });
-                    }); }))];
-        }
-    });
-}); };
+import { addItemToTranslations } from "../utils/add-item-to-translations.js";
+import { translateList } from "../utils/translate-list.js";
+import { loadingBar } from "./loading-bar.js";
 export var patchTranslations = function (path, translations) { return __awaiter(void 0, void 0, void 0, function () {
     var resolver, config, allLanguages;
     return __generator(this, function (_a) {
@@ -98,20 +60,29 @@ export var patchTranslations = function (path, translations) { return __awaiter(
                 resolver = _a.sent();
                 config = applicationConfig.get();
                 allLanguages = __spreadArray(__spreadArray([], config.languages, true), [config.sourceLanguage], false);
+                loadingBar().start("Gerando tradu\u00E7\u00F5es...");
                 return [4 /*yield*/, Promise.all(allLanguages.map(function (language) { return __awaiter(void 0, void 0, void 0, function () {
-                        var content, asTranslations, withoutDuplicates, updatedContent;
+                        var content, asTranslations, translated, updatedContent;
                         return __generator(this, function (_a) {
-                            content = resolver.byLanguage(language.folderName);
-                            asTranslations = convertObjectToTranslations(content[resolver.varName]);
-                            asTranslations.unshift.apply(asTranslations, translations);
-                            withoutDuplicates = removeDuplicate(asTranslations);
-                            updatedContent = convertTranslationsToObject(withoutDuplicates);
-                            fileCreator.create(updatedContent, resolver.varName, resolver.getFullPath(language.folderName));
-                            return [2 /*return*/];
+                            switch (_a.label) {
+                                case 0:
+                                    content = resolver.byLanguage(language.folderName);
+                                    asTranslations = convertObjectToTranslations(content[resolver.varName]);
+                                    return [4 /*yield*/, translateList(translations, language.value)];
+                                case 1:
+                                    translated = _a.sent();
+                                    translated.forEach(function (translation) {
+                                        addItemToTranslations(asTranslations, translation);
+                                    });
+                                    updatedContent = convertTranslationsToObject(asTranslations);
+                                    fileCreator.create(updatedContent, resolver.varName, resolver.getFullPath(language.folderName));
+                                    return [2 /*return*/];
+                            }
                         });
                     }); }))];
             case 2:
                 _a.sent();
+                loadingBar().succeed("Sucesso!");
                 return [2 /*return*/];
         }
     });
