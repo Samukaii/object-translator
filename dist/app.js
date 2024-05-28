@@ -43,8 +43,11 @@ import { Command } from "commander";
 import { createTranslations } from "./commands/create-translations.js";
 import { setupApplication } from "./commands/setup-application.js";
 import { addTranslation } from "./commands/add-translation.js";
+import inquirer from "inquirer";
+import inquirerPrompt from 'inquirer-autocomplete-prompt';
 var program = new Command();
 console.log(figlet.textSync("Translator").blue);
+inquirer.registerPrompt('autocomplete', inquirerPrompt);
 var bootstrap = function () { return __awaiter(void 0, void 0, void 0, function () {
     var args;
     return __generator(this, function (_a) {

@@ -39,12 +39,24 @@ import { FileNotFoundError } from "../exceptions/file-not-found-error.js";
 import { CouldNotFoundVariable } from "../exceptions/could-not-found-variable.js";
 import fs from "fs";
 import { applicationConfig } from "./application-config.js";
+import { BadFormatFileError } from "../exceptions/bad-format-file-error.js";
 var importVariable = function (varName, path) {
     var _a;
-    var content = fs.readFileSync(path, 'utf8');
-    var value = content.substring(content.indexOf('{'), content.lastIndexOf('}') + 1);
+    var content = '';
+    try {
+        content = fs.readFileSync(path, 'utf8');
+    }
+    catch (e) {
+        throw new FileNotFoundError(path);
+    }
+    var value = content.substring(content.indexOf("{"), content.lastIndexOf('}') + 1);
     var variable = {};
-    eval("variable = ".concat(value));
+    try {
+        eval("variable = ".concat(value));
+    }
+    catch (e) {
+        throw new BadFormatFileError(path);
+    }
     return _a = {},
         _a[varName] = variable,
         _a;
@@ -72,7 +84,7 @@ export var createPathResolver = function (fileName) { return __awaiter(void 0, v
             result = importVariable(varName, sourceLanguagePath);
         }
         catch (e) {
-            throw new FileNotFoundError(sourceLanguagePath);
+            throw e;
         }
         if (!result[varName])
             throw new CouldNotFoundVariable(varName, sourceLanguagePath);
@@ -84,6 +96,7 @@ export var createPathResolver = function (fileName) { return __awaiter(void 0, v
                 getFullPath: getFullPath,
                 varName: varName,
                 byLanguage: byLanguage,
+                bySourceLanguage: function () { return byLanguage(config.sourceLanguage.folderName); },
                 content: result[varName]
             }];
     });

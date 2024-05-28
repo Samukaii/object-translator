@@ -34,8 +34,20 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 import inquirer from 'inquirer';
 import { patchTranslations } from "../core/patch-translations.js";
+import { getDirectories } from "../core/get-directories.js";
+import { createPathResolver } from "../core/path-resolver.js";
+import { convertObjectToTranslations } from "../utils/convert-object-to-translations.js";
 var TranslationActions;
 (function (TranslationActions) {
     TranslationActions[TranslationActions["FINISH"] = 1] = "FINISH";
@@ -46,16 +58,22 @@ var TranslationActions;
 var filePath;
 var allTranslations = [];
 var chooseFile = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var result;
+    var directories, result;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, inquirer.prompt([
-                    {
-                        type: "input",
-                        name: "path",
-                        message: "Choose a file path to translate",
-                    },
-                ])];
+            case 0:
+                directories = getDirectories();
+                return [4 /*yield*/, inquirer.prompt([
+                        {
+                            type: "autocomplete",
+                            name: "path",
+                            message: "Choose a file path to translate",
+                            source: function (_answers, input) { return directories.filter(function (directory) {
+                                var _a;
+                                return directory.toLowerCase().includes((_a = input === null || input === void 0 ? void 0 : input.toLowerCase()) !== null && _a !== void 0 ? _a : "");
+                            }); },
+                        },
+                    ])];
             case 1:
                 result = _a.sent();
                 filePath = result['path'];
@@ -64,7 +82,7 @@ var chooseFile = function () { return __awaiter(void 0, void 0, void 0, function
     });
 }); };
 var add = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var asks, result;
+    var resolver, object, translations, asks, result;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -73,12 +91,27 @@ var add = function () { return __awaiter(void 0, void 0, void 0, function () {
             case 1:
                 _a.sent();
                 _a.label = 2;
-            case 2:
+            case 2: return [4 /*yield*/, createPathResolver(filePath)];
+            case 3:
+                resolver = _a.sent();
+                object = resolver.bySourceLanguage();
+                translations = convertObjectToTranslations(object[resolver.varName]).map(function (translation) {
+                    return translation.path;
+                });
                 asks = inquirer.prompt([
                     {
-                        type: "input",
+                        type: "autocomplete",
                         name: "translationPath",
-                        message: "Choose a translation path",
+                        message: "Choose a file path to translate",
+                        source: function (_answers, input) {
+                            var filtered = translations.filter(function (directory) {
+                                var _a;
+                                return directory.toLowerCase().includes((_a = input === null || input === void 0 ? void 0 : input.toLowerCase()) !== null && _a !== void 0 ? _a : "");
+                            });
+                            return __spreadArray([
+                                input !== null && input !== void 0 ? input : ''
+                            ], filtered, true);
+                        },
                     },
                     {
                         type: "input",
@@ -87,7 +120,7 @@ var add = function () { return __awaiter(void 0, void 0, void 0, function () {
                     }
                 ]);
                 return [4 /*yield*/, asks];
-            case 3:
+            case 4:
                 result = _a.sent();
                 allTranslations.unshift({
                     path: result.translationPath,
