@@ -122,7 +122,7 @@ const chooseAction = async () => {
     }
 }
 
-export const addTranslation = async () => {
+export const translationEditor = async () => {
     await chooseFile();
     await add();
     await chooseAction();

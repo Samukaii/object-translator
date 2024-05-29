@@ -1,9 +1,10 @@
-import {CreateTranslationArgs} from "../models/create-translation-args.js";
 import {loadingBar} from "../core/loading-bar.js";
 import {createPathResolver} from "../core/path-resolver.js";
 import {translateObject} from "../utils/translate-object.js";
 import {fileCreator} from "../core/file-creator.js";
 import {applicationConfig} from "../core/application-config.js";
+import inquirer from "inquirer";
+import {searchFiles} from "../utils/search-files.js";
 
 const joinItems = (items: string[]) => {
     const last = items.pop();
@@ -11,7 +12,7 @@ const joinItems = (items: string[]) => {
     return `${items.join(", ")}${last ? ' and ' + last : ''}`;
 }
 
-export const createTranslations = async (args: CreateTranslationArgs) => {
+const createTranslationFiles = async (file: string) => {
     const config = applicationConfig.get();
 
     const sourceLanguageLabel = config.sourceLanguage.label;
@@ -20,7 +21,6 @@ export const createTranslations = async (args: CreateTranslationArgs) => {
     const message = `Translating ${sourceLanguageLabel} to ${languages}`.blue;
 
 
-    const {file} = args;
     const loading = loadingBar();
 
     const resolver = await createPathResolver(file);
@@ -60,4 +60,17 @@ export const createTranslations = async (args: CreateTranslationArgs) => {
     });
 
     loading.stop();
+};
+
+export const translationCreator = async () => {
+    const result = await inquirer.prompt([
+        {
+            type: "autocomplete",
+            name: "path",
+            message: "Choose a file path to translate",
+            source: (_answers: any, input: string) => searchFiles(input),
+        },
+    ]);
+
+    await createTranslationFiles(result["path"])
 };
