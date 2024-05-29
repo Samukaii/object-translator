@@ -26,5 +26,6 @@ const filePath = () => {
 export const applicationConfig = {
     save,
     get,
-    filePath
+    filePath,
+    exists: () => !!persistence.read<ApplicatonConfig>('config')
 }

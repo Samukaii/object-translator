@@ -19,6 +19,7 @@ var filePath = function () {
 export var applicationConfig = {
     save: save,
     get: get,
-    filePath: filePath
+    filePath: filePath,
+    exists: function () { return !!persistence.read('config'); }
 };
 //# sourceMappingURL=application-config.js.map

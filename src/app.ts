@@ -10,6 +10,7 @@ import {setupApplication} from "./commands/setup-application.js";
 import {translationEditor} from "./commands/translation-editor.js";
 import inquirer from "inquirer";
 import inquirerPrompt from 'inquirer-autocomplete-prompt';
+import {applicationConfig} from "./core/application-config.js";
 
 const program = new Command();
 
@@ -19,7 +20,16 @@ inquirer.registerPrompt('autocomplete', inquirerPrompt);
 
 program
     .version("1.0.0")
-    .description("An utility cli to translating objects");
+    .description("An utility cli to translating objects")
+    .action(() => {
+        const exists = applicationConfig.exists();
+
+        if (!exists)
+            setupApplication()
+                .catch((error: Error) => exceptionHandler(error))
+                .finally(() => loadingBar().stop())
+        else program.outputHelp();
+    })
 
 program.command("creator")
     .description('Allow translating a whole file from source language to target languages')
