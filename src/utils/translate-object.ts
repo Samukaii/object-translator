@@ -1,7 +1,7 @@
 import {Generic} from "./stringify-object.js";
 import {convertObjectToTranslations} from "./convert-object-to-translations.js";
 import {Translation} from "../models/translation.js";
-import {translate, TranslationResult} from "bing-translate-api";
+import {translate} from "bing-translate-api";
 import {convertTranslationsToObject} from "./convert-translations-to-object.js";
 import {CouldNotTranslateError} from "../exceptions/could-not-translate-error.js";
 
@@ -17,7 +17,7 @@ const applyTranslation = (translations: Translation[], values: string[]) => {
     return copy;
 }
 
-const separator = ' # '
+const separator = ';';
 
 const cropText = (text: string, limit = 1000) => {
     const terms = text.split(separator);
