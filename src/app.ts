@@ -11,6 +11,7 @@ import {translationEditor} from "./commands/translation-editor.js";
 import inquirer from "inquirer";
 import inquirerPrompt from 'inquirer-autocomplete-prompt';
 import {applicationConfig} from "./core/application-config.js";
+import {translationNew} from "./commands/translation-new.js";
 
 const program = new Command();
 
@@ -34,6 +35,13 @@ program
 program.command("creator")
     .description('Allow translating a whole file from source language to target languages')
     .action(() => translationCreator()
+        .catch((error: Error) => exceptionHandler(error))
+        .finally(() => loadingBar().stop())
+    )
+
+program.command("new")
+    .description('Create blank translation files')
+    .action(() => translationNew()
         .catch((error: Error) => exceptionHandler(error))
         .finally(() => loadingBar().stop())
     )

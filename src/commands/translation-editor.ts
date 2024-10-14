@@ -4,16 +4,18 @@ import {patchTranslations} from "../core/patch-translations.js";
 import {getDirectories} from "../core/get-directories.js";
 import {createPathResolver} from "../core/path-resolver.js";
 import {convertObjectToTranslations} from "../utils/convert-object-to-translations.js";
+import {removeTranslations} from "../core/remove-translations.js";
 
 enum TranslationActions {
-    FINISH = 1,
-    CONTINUE,
+    APPLY = 1,
+    NEW_TRANSLATION,
+    REMOVE_TRANSLATION,
     CANCEL,
-    CHOOSE_PATH
 }
 
 let filePath: string;
-let allTranslations: Translation[] = [];
+let translationsToAddOrEdit: Translation[] = [];
+let translationsToRemove: string[] = [];
 
 const chooseFile = async () => {
     const directories = getDirectories();
@@ -32,14 +34,56 @@ const chooseFile = async () => {
     filePath = result['path'];
 }
 
+const removeTranslation = async () => {
+    if (!filePath) await chooseFile();
+    const resolver = await createPathResolver(filePath);
+    const object = resolver.bySourceLanguage();
+    const existentTranslations = convertObjectToTranslations(object[resolver.varName]).map(translation => {
+        return translation.path
+    });
+
+    const translations = [
+        ...existentTranslations,
+        ...translationsToAddOrEdit.map(translation => translation.path)
+    ];
+
+    const asks = inquirer.prompt([
+        {
+            type: "autocomplete",
+            name: "translationPath",
+            message: "Choose a file path to remove",
+            source: (_answers: any, input: string) => {
+                const filtered = translations.filter(directory => {
+                    return directory.toLowerCase().includes(input?.toLowerCase() ?? "");
+                });
+
+                return [
+                    input ?? '',
+                    ...filtered
+                ];
+            },
+        }
+    ]);
+
+    const result = await asks;
+
+    translationsToAddOrEdit = translationsToAddOrEdit.filter(translation => translation.path !== result.translationPath);
+
+    translationsToRemove.push(result.translationPath);
+}
 
 const add = async () => {
     if (!filePath) await chooseFile();
     const resolver = await createPathResolver(filePath);
     const object = resolver.bySourceLanguage();
-    const translations = convertObjectToTranslations(object[resolver.varName]).map(translation => {
+    const existentTranslations = convertObjectToTranslations(object[resolver.varName]).map(translation => {
         return translation.path
     });
+
+    const translations = [
+        ...existentTranslations,
+        ...translationsToAddOrEdit.map(translation => translation.path)
+    ];
 
     const asks = inquirer.prompt([
         {
@@ -65,14 +109,23 @@ const add = async () => {
     ]);
     const result = await asks;
 
-    allTranslations.unshift({
+    translationsToAddOrEdit = translationsToAddOrEdit.filter(translation => translation.path !== result.translationPath);
+
+    translationsToAddOrEdit.unshift({
         path: result.translationPath,
         value: result.translation,
     });
 }
 
-const finish = async () => {
-    await patchTranslations(filePath, allTranslations);
+const apply = async () => {
+    if(translationsToRemove.length)
+        await removeTranslations(filePath, translationsToRemove);
+
+    if(translationsToAddOrEdit.length)
+        await patchTranslations(filePath, translationsToAddOrEdit);
+
+    if(!translationsToRemove.length && !translationsToAddOrEdit.length)
+        console.log("Nenhuma ação realizada!".yellow);
 }
 
 
@@ -84,21 +137,21 @@ const chooseAction = async () => {
             message: "What do you want to do?",
             choices: [
                 {
-                    value: TranslationActions.FINISH,
-                    name: "Finalizar"
+                    value: TranslationActions.REMOVE_TRANSLATION,
+                    name: "Remover uma tradução"
                 },
                 {
-                    value: TranslationActions.CONTINUE,
-                    name: "Prosseguir"
+                    value: TranslationActions.NEW_TRANSLATION,
+                    name: "Adicionar ou atualizar uma tradução"
+                },
+                {
+                    value: TranslationActions.APPLY,
+                    name: "Aplicar alterações"
                 },
                 {
                     value: TranslationActions.CANCEL,
-                    name: "Cancelar"
+                    name: "Cancelar todas as alterações"
                 },
-                {
-                    value: TranslationActions.CHOOSE_PATH,
-                    name: "Escolher outro arquivo"
-                }
             ]
         },
     ]);
@@ -106,24 +159,22 @@ const chooseAction = async () => {
     const action = asks['action'] as TranslationActions;
 
     switch (action) {
-        case TranslationActions.FINISH:
-            finish();
+        case TranslationActions.APPLY:
+            await apply();
             break;
         case TranslationActions.CANCEL:
             break;
-        case TranslationActions.CONTINUE:
-            await add();
+        case TranslationActions.REMOVE_TRANSLATION:
+            await removeTranslation();
             await chooseAction();
             break;
-        case TranslationActions.CHOOSE_PATH:
-            await chooseFile();
+        case TranslationActions.NEW_TRANSLATION:
+            await add();
             await chooseAction();
             break;
     }
 }
 
 export const translationEditor = async () => {
-    await chooseFile();
-    await add();
     await chooseAction();
 }

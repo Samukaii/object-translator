@@ -32,5 +32,7 @@ export const patchTranslations = async (path: string, translations: Translation[
         fileCreator.create(updatedContent, resolver.varName, resolver.getFullPath(language.folderName));
     }));
 
-    loadingBar().succeed(`Sucesso!`);
+    loadingBar().succeed(`Traduções atualizadas com sucesso!`);
 }
+
+

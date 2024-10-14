@@ -1,33 +1,18 @@
-import {kebabToSnake} from "../utils/kebab-to-snake.js";
 import {Generic} from "../utils/stringify-object.js";
 import {CouldNotFoundVariable} from "../exceptions/could-not-found-variable.js";
 import {applicationConfig} from "./application-config.js";
 import {importVariable} from "./import-variable.js";
+import {getFullPath} from "./get-full-path.js";
+import {getConstVarName} from "../utils/get-const-var-name.js";
 
 export const createPathResolver = async (fileName: string) => {
     const config = applicationConfig.get();
 
     let file = fileName;
-    let parentPath = "";
-    const suffix = config.translationSuffix ? '-' + config.translationSuffix : '';
-
-    if (fileName.includes("/")) {
-        const splinted = fileName.split("/");
-
-        file = splinted.at(-1)!;
-        parentPath = splinted.slice(0, splinted.length - 1).join("/");
-    }
-
-    const getFullPath = (language: string) => {
-        const parentPathConcat = parentPath ? `${parentPath}/` : '';
-        file = file.replace(suffix, "");
-
-        return `${config.basePath}/${language}/${parentPathConcat}${file}${suffix}.ts`;
-    }
 
     let result: Generic;
-    const sourceLanguagePath = getFullPath(config.sourceLanguage.folderName);
-    const varName = kebabToSnake(`${file}${suffix}`).toUpperCase();
+    const sourceLanguagePath = getFullPath(file, config.sourceLanguage.folderName);
+    const varName = getConstVarName(file);
 
     try {
         result = importVariable(varName, sourceLanguagePath);
@@ -36,18 +21,16 @@ export const createPathResolver = async (fileName: string) => {
         throw e;
     }
 
-
     if(!result[varName])
         throw new CouldNotFoundVariable(varName, sourceLanguagePath);
 
     const byLanguage = (language: string) => {
-        const sourceLanguagePath = getFullPath(language);
+        const sourceLanguagePath = getFullPath(fileName, language);
         return importVariable(varName, sourceLanguagePath);
     }
 
-
     return {
-        getFullPath,
+        getFullPath: (language: string) => getFullPath(fileName, language),
         varName,
         byLanguage,
         bySourceLanguage: () => byLanguage(config.sourceLanguage.folderName),

@@ -5,12 +5,7 @@ import {fileCreator} from "../core/file-creator.js";
 import {applicationConfig} from "../core/application-config.js";
 import inquirer from "inquirer";
 import {searchFiles} from "../utils/search-files.js";
-
-const joinItems = (items: string[]) => {
-    const last = items.pop();
-
-    return `${items.join(", ")}${last ? ' and ' + last : ''}`;
-}
+import {joinItems} from "../utils/join-items.js";
 
 const createTranslationFiles = async (file: string) => {
     const config = applicationConfig.get();
