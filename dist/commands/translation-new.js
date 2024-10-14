@@ -35,75 +35,55 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 import { loadingBar } from "../core/loading-bar.js";
-import { createPathResolver } from "../core/path-resolver.js";
-import { translateObject } from "../utils/translate-object.js";
 import { fileCreator } from "../core/file-creator.js";
 import { applicationConfig } from "../core/application-config.js";
 import inquirer from "inquirer";
-import { searchFiles } from "../utils/search-files.js";
+import { getFullPath } from "../core/get-full-path.js";
 import { joinItems } from "../utils/join-items.js";
-var createTranslationFiles = function (file) { return __awaiter(void 0, void 0, void 0, function () {
-    var config, sourceLanguageLabel, languages, message, loading, resolver, sourceLanguage, index, language, translated;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                config = applicationConfig.get();
-                sourceLanguageLabel = config.sourceLanguage.label;
-                languages = joinItems(config.languages.map(function (language) { return language.label; }));
-                message = "Translating ".concat(sourceLanguageLabel, " to ").concat(languages).blue;
-                loading = loadingBar();
-                return [4 /*yield*/, createPathResolver(file)];
-            case 1:
-                resolver = _a.sent();
-                sourceLanguage = config.sourceLanguage;
-                loading.start(message);
-                index = 0;
-                _a.label = 2;
-            case 2:
-                if (!(index < config.languages.length)) return [3 /*break*/, 5];
-                language = config.languages[index];
-                if (language.folderName === sourceLanguage.folderName)
-                    return [3 /*break*/, 4];
-                return [4 /*yield*/, translateObject(resolver.content, sourceLanguage.value, language.value)];
-            case 3:
-                translated = _a.sent();
-                fileCreator.create(translated, resolver.varName, resolver.getFullPath(language.folderName));
-                loading.succeed(" Succesfully created ".concat(language.label, " translations").green);
-                _a.label = 4;
-            case 4:
-                index++;
-                return [3 /*break*/, 2];
-            case 5:
-                console.log('\n');
-                config.languages.forEach(function (language) {
-                    var languageLabel = "".concat(language.label, " translations");
-                    var path = resolver.getFullPath(language.folderName);
-                    console.log("".concat(languageLabel.blue, " => ").concat(path.yellow));
-                });
-                loading.stop();
-                return [2 /*return*/];
+import { getObjectVarName } from "../utils/get-object-var-name.js";
+import { getConstVarName } from "../utils/get-const-var-name.js";
+var createFiles = function (file) { return __awaiter(void 0, void 0, void 0, function () {
+    var config, languages, message, loading, index, language;
+    var _a;
+    return __generator(this, function (_b) {
+        config = applicationConfig.get();
+        languages = joinItems(config.languages.map(function (language) { return language.label; }));
+        message = "Creating files for languages ".concat(languages).blue;
+        loading = loadingBar();
+        loading.start(message);
+        for (index = 0; index < config.languages.length; index++) {
+            language = config.languages[index];
+            fileCreator.create((_a = {}, _a[getObjectVarName(file)] = {}, _a), getConstVarName(file), getFullPath(file, language.folderName));
+            loading.succeed(" Succesfully created ".concat(language.label, " file").green);
         }
+        console.log('\n');
+        config.languages.forEach(function (language) {
+            var languageLabel = "".concat(language.label, " translations");
+            var path = getFullPath(file, language.folderName);
+            console.log("".concat(languageLabel.blue, " => ").concat(path.yellow));
+        });
+        loading.stop();
+        return [2 /*return*/];
     });
 }); };
-export var translationCreator = function () { return __awaiter(void 0, void 0, void 0, function () {
+export var translationNew = function () { return __awaiter(void 0, void 0, void 0, function () {
     var result;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, inquirer.prompt([
                     {
-                        type: "autocomplete",
+                        type: "input",
                         name: "path",
-                        message: "Choose a file path to translate",
-                        source: function (_answers, input) { return searchFiles(input); },
+                        message: "Choose a file path name (kebab-case)",
                     },
                 ])];
             case 1:
                 result = _a.sent();
-                return [4 /*yield*/, createTranslationFiles(result["path"])];
+                return [4 /*yield*/, createFiles(result["path"])];
             case 2:
                 _a.sent();
                 return [2 /*return*/];
         }
     });
 }); };
-//# sourceMappingURL=translation-creator.js.map
+//# sourceMappingURL=translation-new.js.map

@@ -46,7 +46,7 @@ var applyTranslation = function (translations, values) {
     });
     return copy;
 };
-var separator = ' # ';
+var separator = ';';
 var cropText = function (text, limit) {
     if (limit === void 0) { limit = 1000; }
     var terms = text.split(separator);

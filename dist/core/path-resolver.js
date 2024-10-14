@@ -34,52 +34,18 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-import { kebabToSnake } from "../utils/kebab-to-snake.js";
-import { FileNotFoundError } from "../exceptions/file-not-found-error.js";
 import { CouldNotFoundVariable } from "../exceptions/could-not-found-variable.js";
-import fs from "fs";
 import { applicationConfig } from "./application-config.js";
-import { BadFormatFileError } from "../exceptions/bad-format-file-error.js";
-var importVariable = function (varName, path) {
-    var _a;
-    var content = '';
-    try {
-        content = fs.readFileSync(path, 'utf8');
-    }
-    catch (e) {
-        throw new FileNotFoundError(path);
-    }
-    var value = content.substring(content.indexOf("{"), content.lastIndexOf('}') + 1);
-    var variable = {};
-    try {
-        eval("variable = ".concat(value));
-    }
-    catch (e) {
-        throw new BadFormatFileError(path);
-    }
-    return _a = {},
-        _a[varName] = variable,
-        _a;
-};
+import { importVariable } from "./import-variable.js";
+import { getFullPath } from "./get-full-path.js";
+import { getConstVarName } from "../utils/get-const-var-name.js";
 export var createPathResolver = function (fileName) { return __awaiter(void 0, void 0, void 0, function () {
-    var config, file, parentPath, suffix, splinted, getFullPath, result, sourceLanguagePath, varName, byLanguage;
+    var config, file, result, sourceLanguagePath, varName, byLanguage;
     return __generator(this, function (_a) {
         config = applicationConfig.get();
         file = fileName;
-        parentPath = "";
-        suffix = config.translationSuffix ? '-' + config.translationSuffix : '';
-        if (fileName.includes("/")) {
-            splinted = fileName.split("/");
-            file = splinted.at(-1);
-            parentPath = splinted.slice(0, splinted.length - 1).join("/");
-        }
-        getFullPath = function (language) {
-            var parentPathConcat = parentPath ? "".concat(parentPath, "/") : '';
-            file = file.replace(suffix, "");
-            return "".concat(config.basePath, "/").concat(language, "/").concat(parentPathConcat).concat(file).concat(suffix, ".ts");
-        };
-        sourceLanguagePath = getFullPath(config.sourceLanguage.folderName);
-        varName = kebabToSnake("".concat(file).concat(suffix)).toUpperCase();
+        sourceLanguagePath = getFullPath(file, config.sourceLanguage.folderName);
+        varName = getConstVarName(file);
         try {
             result = importVariable(varName, sourceLanguagePath);
         }
@@ -89,11 +55,11 @@ export var createPathResolver = function (fileName) { return __awaiter(void 0, v
         if (!result[varName])
             throw new CouldNotFoundVariable(varName, sourceLanguagePath);
         byLanguage = function (language) {
-            var sourceLanguagePath = getFullPath(language);
+            var sourceLanguagePath = getFullPath(fileName, language);
             return importVariable(varName, sourceLanguagePath);
         };
         return [2 /*return*/, {
-                getFullPath: getFullPath,
+                getFullPath: function (language) { return getFullPath(fileName, language); },
                 varName: varName,
                 byLanguage: byLanguage,
                 bySourceLanguage: function () { return byLanguage(config.sourceLanguage.folderName); },

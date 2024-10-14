@@ -45,13 +45,11 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 };
 import { createPathResolver } from "./path-resolver.js";
 import { applicationConfig } from "./application-config.js";
-import { convertObjectToTranslations } from "../utils/convert-object-to-translations.js";
-import { fileCreator } from "./file-creator.js";
-import { convertTranslationsToObject } from "../utils/convert-translations-to-object.js";
-import { addItemToTranslations } from "../utils/add-item-to-translations.js";
-import { translateList } from "../utils/translate-list.js";
 import { loadingBar } from "./loading-bar.js";
-export var patchTranslations = function (path, translations) { return __awaiter(void 0, void 0, void 0, function () {
+import { convertObjectToTranslations } from "../utils/convert-object-to-translations.js";
+import { convertTranslationsToObject } from "../utils/convert-translations-to-object.js";
+import { fileCreator } from "./file-creator.js";
+export var removeTranslations = function (path, translationsToRemove) { return __awaiter(void 0, void 0, void 0, function () {
     var resolver, config, allLanguages;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -60,31 +58,25 @@ export var patchTranslations = function (path, translations) { return __awaiter(
                 resolver = _a.sent();
                 config = applicationConfig.get();
                 allLanguages = __spreadArray(__spreadArray([], config.languages, true), [config.sourceLanguage], false);
-                loadingBar().start("Gerando tradu\u00E7\u00F5es...");
+                loadingBar().start("Removendo tradu\u00E7\u00F5es...");
                 return [4 /*yield*/, Promise.all(allLanguages.map(function (language) { return __awaiter(void 0, void 0, void 0, function () {
-                        var content, asTranslations, translated, updatedContent;
+                        var content, existentTranslations, existentWithoutTranslations, updatedContent;
                         return __generator(this, function (_a) {
-                            switch (_a.label) {
-                                case 0:
-                                    content = resolver.byLanguage(language.folderName);
-                                    asTranslations = convertObjectToTranslations(content[resolver.varName]);
-                                    return [4 /*yield*/, translateList(translations, language.value)];
-                                case 1:
-                                    translated = _a.sent();
-                                    translated.forEach(function (translation) {
-                                        addItemToTranslations(asTranslations, translation);
-                                    });
-                                    updatedContent = convertTranslationsToObject(asTranslations);
-                                    fileCreator.create(updatedContent, resolver.varName, resolver.getFullPath(language.folderName));
-                                    return [2 /*return*/];
-                            }
+                            content = resolver.byLanguage(language.folderName);
+                            existentTranslations = convertObjectToTranslations(content[resolver.varName]);
+                            existentWithoutTranslations = existentTranslations.filter(function (translation) {
+                                return !translationsToRemove.find(function (translationToRemove) { return translation.path === translationToRemove; });
+                            });
+                            updatedContent = convertTranslationsToObject(existentWithoutTranslations);
+                            fileCreator.create(updatedContent, resolver.varName, resolver.getFullPath(language.folderName));
+                            return [2 /*return*/];
                         });
                     }); }))];
             case 2:
                 _a.sent();
-                loadingBar().succeed("Tradu\u00E7\u00F5es atualizadas com sucesso!");
+                loadingBar().succeed("Tradu\u00E7\u00F5es removidas com sucesso!");
                 return [2 /*return*/];
         }
     });
 }); };
-//# sourceMappingURL=patch-translations.js.map
+//# sourceMappingURL=remove-translations.js.map

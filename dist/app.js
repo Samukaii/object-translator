@@ -10,6 +10,7 @@ import { translationEditor } from "./commands/translation-editor.js";
 import inquirer from "inquirer";
 import inquirerPrompt from 'inquirer-autocomplete-prompt';
 import { applicationConfig } from "./core/application-config.js";
+import { translationNew } from "./commands/translation-new.js";
 var program = new Command();
 console.log(figlet.textSync("Translator").blue);
 inquirer.registerPrompt('autocomplete', inquirerPrompt);
@@ -28,6 +29,11 @@ program
 program.command("creator")
     .description('Allow translating a whole file from source language to target languages')
     .action(function () { return translationCreator()
+    .catch(function (error) { return exceptionHandler(error); })
+    .finally(function () { return loadingBar().stop(); }); });
+program.command("new")
+    .description('Create blank translation files')
+    .action(function () { return translationNew()
     .catch(function (error) { return exceptionHandler(error); })
     .finally(function () { return loadingBar().stop(); }); });
 program.command('config')

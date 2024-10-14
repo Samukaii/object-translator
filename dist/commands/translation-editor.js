@@ -48,15 +48,17 @@ import { patchTranslations } from "../core/patch-translations.js";
 import { getDirectories } from "../core/get-directories.js";
 import { createPathResolver } from "../core/path-resolver.js";
 import { convertObjectToTranslations } from "../utils/convert-object-to-translations.js";
+import { removeTranslations } from "../core/remove-translations.js";
 var TranslationActions;
 (function (TranslationActions) {
-    TranslationActions[TranslationActions["FINISH"] = 1] = "FINISH";
-    TranslationActions[TranslationActions["CONTINUE"] = 2] = "CONTINUE";
-    TranslationActions[TranslationActions["CANCEL"] = 3] = "CANCEL";
-    TranslationActions[TranslationActions["CHOOSE_PATH"] = 4] = "CHOOSE_PATH";
+    TranslationActions[TranslationActions["APPLY"] = 1] = "APPLY";
+    TranslationActions[TranslationActions["NEW_TRANSLATION"] = 2] = "NEW_TRANSLATION";
+    TranslationActions[TranslationActions["REMOVE_TRANSLATION"] = 3] = "REMOVE_TRANSLATION";
+    TranslationActions[TranslationActions["CANCEL"] = 4] = "CANCEL";
 })(TranslationActions || (TranslationActions = {}));
 var filePath;
-var allTranslations = [];
+var translationsToAddOrEdit = [];
+var translationsToRemove = [];
 var chooseFile = function () { return __awaiter(void 0, void 0, void 0, function () {
     var directories, result;
     return __generator(this, function (_a) {
@@ -81,8 +83,8 @@ var chooseFile = function () { return __awaiter(void 0, void 0, void 0, function
         }
     });
 }); };
-var add = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var resolver, object, translations, asks, result;
+var removeTranslation = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var resolver, object, existentTranslations, translations, asks, result;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -95,9 +97,53 @@ var add = function () { return __awaiter(void 0, void 0, void 0, function () {
             case 3:
                 resolver = _a.sent();
                 object = resolver.bySourceLanguage();
-                translations = convertObjectToTranslations(object[resolver.varName]).map(function (translation) {
+                existentTranslations = convertObjectToTranslations(object[resolver.varName]).map(function (translation) {
                     return translation.path;
                 });
+                translations = __spreadArray(__spreadArray([], existentTranslations, true), translationsToAddOrEdit.map(function (translation) { return translation.path; }), true);
+                asks = inquirer.prompt([
+                    {
+                        type: "autocomplete",
+                        name: "translationPath",
+                        message: "Choose a file path to remove",
+                        source: function (_answers, input) {
+                            var filtered = translations.filter(function (directory) {
+                                var _a;
+                                return directory.toLowerCase().includes((_a = input === null || input === void 0 ? void 0 : input.toLowerCase()) !== null && _a !== void 0 ? _a : "");
+                            });
+                            return __spreadArray([
+                                input !== null && input !== void 0 ? input : ''
+                            ], filtered, true);
+                        },
+                    }
+                ]);
+                return [4 /*yield*/, asks];
+            case 4:
+                result = _a.sent();
+                translationsToAddOrEdit = translationsToAddOrEdit.filter(function (translation) { return translation.path !== result.translationPath; });
+                translationsToRemove.push(result.translationPath);
+                return [2 /*return*/];
+        }
+    });
+}); };
+var add = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var resolver, object, existentTranslations, translations, asks, result;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                if (!!filePath) return [3 /*break*/, 2];
+                return [4 /*yield*/, chooseFile()];
+            case 1:
+                _a.sent();
+                _a.label = 2;
+            case 2: return [4 /*yield*/, createPathResolver(filePath)];
+            case 3:
+                resolver = _a.sent();
+                object = resolver.bySourceLanguage();
+                existentTranslations = convertObjectToTranslations(object[resolver.varName]).map(function (translation) {
+                    return translation.path;
+                });
+                translations = __spreadArray(__spreadArray([], existentTranslations, true), translationsToAddOrEdit.map(function (translation) { return translation.path; }), true);
                 asks = inquirer.prompt([
                     {
                         type: "autocomplete",
@@ -122,7 +168,8 @@ var add = function () { return __awaiter(void 0, void 0, void 0, function () {
                 return [4 /*yield*/, asks];
             case 4:
                 result = _a.sent();
-                allTranslations.unshift({
+                translationsToAddOrEdit = translationsToAddOrEdit.filter(function (translation) { return translation.path !== result.translationPath; });
+                translationsToAddOrEdit.unshift({
                     path: result.translationPath,
                     value: result.translation,
                 });
@@ -130,12 +177,24 @@ var add = function () { return __awaiter(void 0, void 0, void 0, function () {
         }
     });
 }); };
-var finish = function () { return __awaiter(void 0, void 0, void 0, function () {
+var apply = function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, patchTranslations(filePath, allTranslations)];
+            case 0:
+                if (!translationsToRemove.length) return [3 /*break*/, 2];
+                return [4 /*yield*/, removeTranslations(filePath, translationsToRemove)];
             case 1:
                 _a.sent();
+                _a.label = 2;
+            case 2:
+                if (!translationsToAddOrEdit.length) return [3 /*break*/, 4];
+                return [4 /*yield*/, patchTranslations(filePath, translationsToAddOrEdit)];
+            case 3:
+                _a.sent();
+                _a.label = 4;
+            case 4:
+                if (!translationsToRemove.length && !translationsToAddOrEdit.length)
+                    console.log("Nenhuma ação realizada!".yellow);
                 return [2 /*return*/];
         }
     });
@@ -151,21 +210,21 @@ var chooseAction = function () { return __awaiter(void 0, void 0, void 0, functi
                         message: "What do you want to do?",
                         choices: [
                             {
-                                value: TranslationActions.FINISH,
-                                name: "Finalizar"
+                                value: TranslationActions.REMOVE_TRANSLATION,
+                                name: "Remover uma tradução"
                             },
                             {
-                                value: TranslationActions.CONTINUE,
-                                name: "Prosseguir"
+                                value: TranslationActions.NEW_TRANSLATION,
+                                name: "Adicionar ou atualizar uma tradução"
+                            },
+                            {
+                                value: TranslationActions.APPLY,
+                                name: "Aplicar alterações"
                             },
                             {
                                 value: TranslationActions.CANCEL,
-                                name: "Cancelar"
+                                name: "Cancelar todas as alterações"
                             },
-                            {
-                                value: TranslationActions.CHOOSE_PATH,
-                                name: "Escolher outro arquivo"
-                            }
                         ]
                     },
                 ])];
@@ -174,45 +233,40 @@ var chooseAction = function () { return __awaiter(void 0, void 0, void 0, functi
                 action = asks['action'];
                 _a = action;
                 switch (_a) {
-                    case TranslationActions.FINISH: return [3 /*break*/, 2];
-                    case TranslationActions.CANCEL: return [3 /*break*/, 3];
-                    case TranslationActions.CONTINUE: return [3 /*break*/, 4];
-                    case TranslationActions.CHOOSE_PATH: return [3 /*break*/, 7];
+                    case TranslationActions.APPLY: return [3 /*break*/, 2];
+                    case TranslationActions.CANCEL: return [3 /*break*/, 4];
+                    case TranslationActions.REMOVE_TRANSLATION: return [3 /*break*/, 5];
+                    case TranslationActions.NEW_TRANSLATION: return [3 /*break*/, 8];
                 }
-                return [3 /*break*/, 10];
-            case 2:
-                finish();
-                return [3 /*break*/, 10];
-            case 3: return [3 /*break*/, 10];
-            case 4: return [4 /*yield*/, add()];
-            case 5:
+                return [3 /*break*/, 11];
+            case 2: return [4 /*yield*/, apply()];
+            case 3:
                 _b.sent();
-                return [4 /*yield*/, chooseAction()];
+                return [3 /*break*/, 11];
+            case 4: return [3 /*break*/, 11];
+            case 5: return [4 /*yield*/, removeTranslation()];
             case 6:
                 _b.sent();
-                return [3 /*break*/, 10];
-            case 7: return [4 /*yield*/, chooseFile()];
-            case 8:
-                _b.sent();
                 return [4 /*yield*/, chooseAction()];
+            case 7:
+                _b.sent();
+                return [3 /*break*/, 11];
+            case 8: return [4 /*yield*/, add()];
             case 9:
                 _b.sent();
-                return [3 /*break*/, 10];
-            case 10: return [2 /*return*/];
+                return [4 /*yield*/, chooseAction()];
+            case 10:
+                _b.sent();
+                return [3 /*break*/, 11];
+            case 11: return [2 /*return*/];
         }
     });
 }); };
 export var translationEditor = function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, chooseFile()];
+            case 0: return [4 /*yield*/, chooseAction()];
             case 1:
-                _a.sent();
-                return [4 /*yield*/, add()];
-            case 2:
-                _a.sent();
-                return [4 /*yield*/, chooseAction()];
-            case 3:
                 _a.sent();
                 return [2 /*return*/];
         }
