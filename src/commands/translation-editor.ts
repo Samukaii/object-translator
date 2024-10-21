@@ -38,13 +38,11 @@ const removeTranslation = async () => {
     if (!filePath) await chooseFile();
     const resolver = await createPathResolver(filePath);
     const object = resolver.bySourceLanguage();
-    const existentTranslations = convertObjectToTranslations(object[resolver.varName]).map(translation => {
-        return translation.path
-    });
+    const existentTranslations = convertObjectToTranslations(object[resolver.varName]);
 
     const translations = [
         ...existentTranslations,
-        ...translationsToAddOrEdit.map(translation => translation.path)
+        ...translationsToAddOrEdit
     ];
 
     const asks = inquirer.prompt([
@@ -54,12 +52,14 @@ const removeTranslation = async () => {
             message: "Choose a file path to remove",
             source: (_answers: any, input: string) => {
                 const filtered = translations.filter(directory => {
-                    return directory.toLowerCase().includes(input?.toLowerCase() ?? "");
+                    return directory.path.toLowerCase().includes(input?.toLowerCase() ?? "");
                 });
 
                 return [
                     input ?? '',
-                    ...filtered
+                    ...filtered.map(translation => {
+                        return `${translation.path}: ${translation.value}`
+                    })
                 ];
             },
         }
@@ -76,13 +76,11 @@ const add = async () => {
     if (!filePath) await chooseFile();
     const resolver = await createPathResolver(filePath);
     const object = resolver.bySourceLanguage();
-    const existentTranslations = convertObjectToTranslations(object[resolver.varName]).map(translation => {
-        return translation.path
-    });
+    const existentTranslations = convertObjectToTranslations(object[resolver.varName]);
 
     const translations = [
         ...existentTranslations,
-        ...translationsToAddOrEdit.map(translation => translation.path)
+        ...translationsToAddOrEdit
     ];
 
     const asks = inquirer.prompt([
@@ -92,12 +90,14 @@ const add = async () => {
             message: "Choose a file path to translate",
             source: (_answers: any, input: string) => {
                 const filtered = translations.filter(directory => {
-                    return directory.toLowerCase().includes(input?.toLowerCase() ?? "");
+                    return directory.path.toLowerCase().includes(input?.toLowerCase() ?? "");
                 });
 
                 return [
                     input ?? '',
-                    ...filtered
+                    ...filtered.map(translation => {
+                        return `${translation.path}: ${translation.value}`
+                    })
                 ];
             },
         },

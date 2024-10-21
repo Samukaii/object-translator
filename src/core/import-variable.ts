@@ -1,8 +1,8 @@
 import fs from "fs";
 import {FileNotFoundError} from "../exceptions/file-not-found-error.js";
-import {replaceAll} from "../utils/replace-all.js";
 import {Generic} from "../utils/stringify-object.js";
 import {BadFormatFileError} from "../exceptions/bad-format-file-error.js";
+import {turnImportsIntoConstants} from "../utils/turn-imports-into-constants.js";
 
 export const importVariable = (varName: string, path: string) => {
     let content = '';
@@ -13,15 +13,18 @@ export const importVariable = (varName: string, path: string) => {
         throw new FileNotFoundError(path);
     }
 
-    const withoutImports = replaceAll(content, /import\s*\{\s*.*}\s*from\s*["'].*["'];*/gm, '');
-    const cleanText = replaceAll(withoutImports, /\.\.\..*,?/gm, '');
+    const cleanText = turnImportsIntoConstants(content);
 
-    let value = cleanText.substring(cleanText.indexOf(`{`), cleanText.lastIndexOf('}') + 1);
+    const regex = new RegExp(`export const ${varName}\\s*=\\s*`);
+
+    const variableDeclarationStart = cleanText.match(regex)?.[0] ?? '';
 
     let variable: Generic = {};
 
     try {
-        eval(`variable = ${value}`);
+        const expression = cleanText.replace(variableDeclarationStart, 'variable = ');
+
+        eval(expression);
     } catch (e) {
         throw new BadFormatFileError(path);
     }

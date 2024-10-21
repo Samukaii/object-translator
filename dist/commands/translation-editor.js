@@ -97,10 +97,8 @@ var removeTranslation = function () { return __awaiter(void 0, void 0, void 0, f
             case 3:
                 resolver = _a.sent();
                 object = resolver.bySourceLanguage();
-                existentTranslations = convertObjectToTranslations(object[resolver.varName]).map(function (translation) {
-                    return translation.path;
-                });
-                translations = __spreadArray(__spreadArray([], existentTranslations, true), translationsToAddOrEdit.map(function (translation) { return translation.path; }), true);
+                existentTranslations = convertObjectToTranslations(object[resolver.varName]);
+                translations = __spreadArray(__spreadArray([], existentTranslations, true), translationsToAddOrEdit, true);
                 asks = inquirer.prompt([
                     {
                         type: "autocomplete",
@@ -109,11 +107,13 @@ var removeTranslation = function () { return __awaiter(void 0, void 0, void 0, f
                         source: function (_answers, input) {
                             var filtered = translations.filter(function (directory) {
                                 var _a;
-                                return directory.toLowerCase().includes((_a = input === null || input === void 0 ? void 0 : input.toLowerCase()) !== null && _a !== void 0 ? _a : "");
+                                return directory.path.toLowerCase().includes((_a = input === null || input === void 0 ? void 0 : input.toLowerCase()) !== null && _a !== void 0 ? _a : "");
                             });
                             return __spreadArray([
                                 input !== null && input !== void 0 ? input : ''
-                            ], filtered, true);
+                            ], filtered.map(function (translation) {
+                                return "".concat(translation.path, ": ").concat(translation.value);
+                            }), true);
                         },
                     }
                 ]);
@@ -140,10 +140,8 @@ var add = function () { return __awaiter(void 0, void 0, void 0, function () {
             case 3:
                 resolver = _a.sent();
                 object = resolver.bySourceLanguage();
-                existentTranslations = convertObjectToTranslations(object[resolver.varName]).map(function (translation) {
-                    return translation.path;
-                });
-                translations = __spreadArray(__spreadArray([], existentTranslations, true), translationsToAddOrEdit.map(function (translation) { return translation.path; }), true);
+                existentTranslations = convertObjectToTranslations(object[resolver.varName]);
+                translations = __spreadArray(__spreadArray([], existentTranslations, true), translationsToAddOrEdit, true);
                 asks = inquirer.prompt([
                     {
                         type: "autocomplete",
@@ -152,11 +150,13 @@ var add = function () { return __awaiter(void 0, void 0, void 0, function () {
                         source: function (_answers, input) {
                             var filtered = translations.filter(function (directory) {
                                 var _a;
-                                return directory.toLowerCase().includes((_a = input === null || input === void 0 ? void 0 : input.toLowerCase()) !== null && _a !== void 0 ? _a : "");
+                                return directory.path.toLowerCase().includes((_a = input === null || input === void 0 ? void 0 : input.toLowerCase()) !== null && _a !== void 0 ? _a : "");
                             });
                             return __spreadArray([
                                 input !== null && input !== void 0 ? input : ''
-                            ], filtered, true);
+                            ], filtered.map(function (translation) {
+                                return "".concat(translation.path, ": ").concat(translation.value);
+                            }), true);
                         },
                     },
                     {

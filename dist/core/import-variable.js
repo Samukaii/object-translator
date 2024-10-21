@@ -1,9 +1,10 @@
 import fs from "fs";
 import { FileNotFoundError } from "../exceptions/file-not-found-error.js";
-import { replaceAll } from "../utils/replace-all.js";
 import { BadFormatFileError } from "../exceptions/bad-format-file-error.js";
+import { turnImportsIntoConstants } from "../utils/turn-imports-into-constants.js";
 export var importVariable = function (varName, path) {
     var _a;
+    var _b, _c;
     var content = '';
     try {
         content = fs.readFileSync(path, 'utf8');
@@ -11,12 +12,13 @@ export var importVariable = function (varName, path) {
     catch (e) {
         throw new FileNotFoundError(path);
     }
-    var withoutImports = replaceAll(content, /import\s*\{\s*.*}\s*from\s*["'].*["'];*/gm, '');
-    var cleanText = replaceAll(withoutImports, /\.\.\..*,?/gm, '');
-    var value = cleanText.substring(cleanText.indexOf("{"), cleanText.lastIndexOf('}') + 1);
+    var cleanText = turnImportsIntoConstants(content);
+    var regex = new RegExp("export const ".concat(varName, "\\s*=\\s*"));
+    var variableDeclarationStart = (_c = (_b = cleanText.match(regex)) === null || _b === void 0 ? void 0 : _b[0]) !== null && _c !== void 0 ? _c : '';
     var variable = {};
     try {
-        eval("variable = ".concat(value));
+        var expression = cleanText.replace(variableDeclarationStart, 'variable = ');
+        eval(expression);
     }
     catch (e) {
         throw new BadFormatFileError(path);
