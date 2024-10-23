@@ -34,30 +34,41 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-import { loadingBar } from "../core/loading-bar.js";
-import { fileCreator } from "../core/file-creator.js";
-import { applicationConfig } from "../core/application-config.js";
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
+import {loadingBar} from "../core/loading-bar.js";
+import {fileCreator} from "../core/file-creator.js";
+import {applicationConfig} from "../core/application-config.js";
 import inquirer from "inquirer";
-import { getFullPath } from "../core/get-full-path.js";
-import { joinItems } from "../utils/join-items.js";
-import { getObjectVarName } from "../utils/get-object-var-name.js";
-import { getConstVarName } from "../utils/get-const-var-name.js";
+import {getFullPath} from "../core/get-full-path.js";
+import {joinItems} from "../utils/join-items.js";
+import {getObjectVarName} from "../utils/get-object-var-name.js";
+import {getConstVarName} from "../utils/get-const-var-name.js";
+
 var createFiles = function (file) { return __awaiter(void 0, void 0, void 0, function () {
-    var config, languages, message, loading, index, language;
+    var config, allLanguages, languages, message, loading, index, language;
     var _a;
     return __generator(this, function (_b) {
         config = applicationConfig.get();
-        languages = joinItems(config.languages.map(function (language) { return language.label; }));
+        allLanguages = __spreadArray(__spreadArray([], config.languages, true), [config.sourceLanguage], false);
+        languages = joinItems(allLanguages.map(function (language) { return language.label; }));
         message = "Creating files for languages ".concat(languages).blue;
         loading = loadingBar();
         loading.start(message);
-        for (index = 0; index < config.languages.length; index++) {
-            language = config.languages[index];
+        for (index = 0; index < allLanguages.length; index++) {
+            language = allLanguages[index];
             fileCreator.create((_a = {}, _a[getObjectVarName(file)] = {}, _a), getConstVarName(file), getFullPath(file, language.folderName));
             loading.succeed(" Succesfully created ".concat(language.label, " file").green);
         }
         console.log('\n');
-        config.languages.forEach(function (language) {
+        allLanguages.forEach(function (language) {
             var languageLabel = "".concat(language.label, " translations");
             var path = getFullPath(file, language.folderName);
             console.log("".concat(languageLabel.blue, " => ").concat(path.yellow));

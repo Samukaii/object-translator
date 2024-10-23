@@ -9,8 +9,9 @@ import {getConstVarName} from "../utils/get-const-var-name.js";
 
 const createFiles = async (file: string) => {
     const config = applicationConfig.get();
+    const allLanguages = [...config.languages, config.sourceLanguage];
 
-    const languages = joinItems(config.languages.map(language => language.label));
+    const languages = joinItems(allLanguages.map(language => language.label));
 
     const message = `Creating files for languages ${languages}`.blue;
 
@@ -18,8 +19,8 @@ const createFiles = async (file: string) => {
 
     loading.start(message);
 
-    for (let index = 0; index < config.languages.length; index++) {
-        const language = config.languages[index];
+    for (let index = 0; index < allLanguages.length; index++) {
+        const language = allLanguages[index];
 
         fileCreator.create(
             {[getObjectVarName(file)]: {}},
@@ -32,7 +33,7 @@ const createFiles = async (file: string) => {
 
     console.log('\n');
 
-    config.languages.forEach(language => {
+    allLanguages.forEach(language => {
         const languageLabel = `${language.label} translations`;
         const path = getFullPath(file, language.folderName);
 
