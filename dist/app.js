@@ -1,16 +1,18 @@
 #! /usr/bin/env node
 import 'colors';
-import { exceptionHandler } from "./exceptions/exception-handler.js";
-import { loadingBar } from "./core/loading-bar.js";
+import {exceptionHandler} from "./exceptions/exception-handler.js";
+import {loadingBar} from "./core/loading-bar.js";
 import figlet from 'figlet';
-import { Command } from "commander";
-import { translationCreator } from "./commands/translation-creator.js";
-import { setupApplication } from "./commands/setup-application.js";
-import { translationEditor } from "./commands/translation-editor.js";
+import {Command} from "commander";
+import {translationCreator} from "./commands/translation-creator.js";
+import {setupApplication} from "./commands/setup-application.js";
+import {translationEditor} from "./commands/translation-editor.js";
 import inquirer from "inquirer";
 import inquirerPrompt from 'inquirer-autocomplete-prompt';
-import { applicationConfig } from "./core/application-config.js";
-import { translationNew } from "./commands/translation-new.js";
+import {applicationConfig} from "./core/application-config.js";
+import {translationNew} from "./commands/translation-new.js";
+import {translationMove} from "./commands/translation-move.js";
+
 var program = new Command();
 console.log(figlet.textSync("Translator").blue);
 inquirer.registerPrompt('autocomplete', inquirerPrompt);
@@ -34,6 +36,11 @@ program.command("creator")
 program.command("new")
     .description('Create blank translation files')
     .action(function () { return translationNew()
+    .catch(function (error) { return exceptionHandler(error); })
+    .finally(function () { return loadingBar().stop(); }); });
+program.command("move")
+    .description('Move or rename a translation file')
+    .action(function () { return translationMove()
     .catch(function (error) { return exceptionHandler(error); })
     .finally(function () { return loadingBar().stop(); }); });
 program.command('config')

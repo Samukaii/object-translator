@@ -12,6 +12,7 @@ import inquirer from "inquirer";
 import inquirerPrompt from 'inquirer-autocomplete-prompt';
 import {applicationConfig} from "./core/application-config.js";
 import {translationNew} from "./commands/translation-new.js";
+import {translationMove} from "./commands/translation-move.js";
 
 const program = new Command();
 
@@ -42,6 +43,13 @@ program.command("creator")
 program.command("new")
     .description('Create blank translation files')
     .action(() => translationNew()
+        .catch((error: Error) => exceptionHandler(error))
+        .finally(() => loadingBar().stop())
+    )
+
+program.command("move")
+    .description('Move or rename a translation file')
+    .action(() => translationMove()
         .catch((error: Error) => exceptionHandler(error))
         .finally(() => loadingBar().stop())
     )
